@@ -16,7 +16,7 @@
 - 공유 기능 유지
 
 확인 주소:
-https://jannyland7005.github.io/texas-today/?v=rebuild1-2
+https://jannyland7005.github.io/texas-today/?v=rebuild1-3
 
 
-v1.2: app safe-area padding + generated newsletter top padding added.
+v1.3: final shared canvas image top padding added only in renderer.js. UI layout unchanged.

@@ -1,4 +1,5 @@
 const W = 1080;
+const OUTPUT_TOP_PADDING = 110;
 let uploadedImages = [];
 let rerollOffset = 0;
 let latestBlob = null;
@@ -303,7 +304,7 @@ function renderNewsletter() {
   const innerW = cardW - 72;
   const gap = 30;
 
-  let y = 88;
+  let y = 88 + OUTPUT_TOP_PADDING;
 
   // Header
   ctx.font = font(900, TYPE.title);
@@ -317,11 +318,11 @@ function renderNewsletter() {
   const dateText = formatDate(date);
   ctx.font = font(800, TYPE.date);
   const dw = ctx.measureText(dateText).width + 74;
-  fillRound(ctx, W - 58 - dw, 38, dw, 90, 45, "#fffdf8", COLORS.line, 2);
+  fillRound(ctx, W - 58 - dw, 38 + OUTPUT_TOP_PADDING, dw, 90, 45, "#fffdf8", COLORS.line, 2);
   ctx.fillStyle = COLORS.ink;
-  ctx.fillText(dateText, W - 58 - dw + 37, 96);
+  ctx.fillText(dateText, W - 58 - dw + 37, 96 + OUTPUT_TOP_PADDING);
 
-  y = subtitle ? 184 : 154;
+  y = (subtitle ? 184 : 154) + OUTPUT_TOP_PADDING;
 
   // Family
   const pLayout = photoLayout(uploadedImages, innerW);

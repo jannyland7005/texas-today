@@ -11,7 +11,6 @@
 
 body {
   margin: 0;
-  padding-top: env(safe-area-inset-top);
   font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
   background: var(--bg);
   color: var(--ink);
@@ -20,8 +19,7 @@ body {
 .app {
   max-width: 1220px;
   margin: 0 auto;
-  padding: 44px 18px 18px;
-  padding-top: calc(env(safe-area-inset-top) + 44px);
+  padding: 18px;
   display: grid;
   grid-template-columns: 360px 1fr;
   gap: 20px;
@@ -124,8 +122,7 @@ canvas {
 @media (max-width: 900px) {
   .app {
     display: block;
-    padding: 54px 10px 10px;
-    padding-top: calc(env(safe-area-inset-top) + 54px);
+    padding: 10px;
   }
   .panel {
     position: static;
