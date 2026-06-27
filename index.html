@@ -329,14 +329,44 @@
       font-weight: 800;
       color: #9a816b;
     }
+    .captureMode {
+      width: 1080px !important;
+      min-width: 1080px !important;
+      transform: none !important;
+      margin: 0 !important;
+      position: static !important;
+    }
     @media (max-width: 900px) {
-      .app { grid-template-columns: 1fr; padding: 12px; }
-      .panel { position: static; }
-      .row { grid-template-columns: 1fr; }
-      button { font-size: 16px; }
-      input, textarea { font-size: 16px; }
-      #newsletter { transform: scale(.35); margin: -610px 0; }
-      .previewWrap { min-height: 720px; }
+      .app {
+        grid-template-columns: 1fr;
+        padding: 10px;
+        gap: 14px;
+      }
+      .panel {
+        position: static;
+      }
+      .row {
+        grid-template-columns: 1fr;
+      }
+      button {
+        font-size: 16px;
+      }
+      input, textarea {
+        font-size: 16px;
+      }
+      .previewWrap {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 20px;
+      }
+      #newsletter {
+        width: 1080px !important;
+        min-width: 1080px !important;
+        transform: scale(0.34);
+        transform-origin: top left;
+        margin-right: -710px;
+        margin-bottom: -1260px;
+      }
     }
   </style>
 </head>
@@ -345,7 +375,7 @@
     <aside class="panel">
       <h1>텍사스, 오늘 생성기</h1>
       <p>날짜, 사진, 설명을 넣고 가족 뉴스레터 이미지를 공유하세요.</p>
-      <div class="installNote">휴대폰에서 이 주소를 연 뒤 “홈 화면에 추가”를 하면 앱처럼 사용할 수 있습니다.<br><span id="appVersion">공유 기능 수정판 v2</span></div>
+      <div class="installNote">휴대폰에서 이 주소를 연 뒤 “홈 화면에 추가”를 하면 앱처럼 사용할 수 있습니다.<br><span id="appVersion">레이아웃/사진 수정판 v4</span></div>
 
       <label>날짜</label>
       <input id="dateInput" type="date" />
@@ -1436,19 +1466,35 @@ function handlePhotos(files) {
   grid.innerHTML = "";
   const selected = Array.from(files).slice(0, 4);
   grid.className = selected.length <= 1 ? "photoGrid one" : "photoGrid";
+
   if (selected.length === 0) {
     grid.innerHTML = `<div style="height:220px;border-radius:22px;background:#f5eadb;display:grid;place-items:center;font-size:30px;color:#8d765f;">사진을 올리면 여기에 표시됩니다</div>`;
     return;
   }
+
   selected.forEach(file => {
     const reader = new FileReader();
     reader.onload = e => {
       const img = document.createElement("img");
+      img.onload = () => img.dataset.loaded = "true";
+      img.onerror = () => img.dataset.loaded = "error";
       img.src = e.target.result;
       grid.appendChild(img);
     };
     reader.readAsDataURL(file);
   });
+}
+
+function waitForImages(container) {
+  const images = Array.from(container.querySelectorAll("img"));
+  return Promise.all(images.map(img => {
+    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+    return new Promise(resolve => {
+      img.onload = () => resolve();
+      img.onerror = () => resolve();
+      setTimeout(resolve, 2000);
+    });
+  }));
 }
 
 function setSaveStatus(message) {
@@ -1472,19 +1518,31 @@ function dataUrlToBlob(dataUrl) {
 }
 
 async function makeNewsletterDataUrl() {
-  if (!window.htmlToImage) {
-    throw new Error("이미지 저장 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 다시 열어주세요.");
-  }
-  if (document.fonts && document.fonts.ready) {
-    await document.fonts.ready;
-  }
   const node = document.getElementById("newsletter");
-  return await htmlToImage.toPng(node, {
-    pixelRatio: isMobileDevice() ? 1 : Math.min(2, window.devicePixelRatio || 1),
-    cacheBust: true,
-    backgroundColor: "#f8eedf",
-    style: { transform: "none" }
-  });
+
+  node.classList.add("captureMode");
+  await waitForImages(node);
+  await new Promise(resolve => setTimeout(resolve, 250));
+
+  try {
+    const dataUrl = await htmlToImage.toPng(node, {
+      pixelRatio: 1,
+      cacheBust: true,
+      backgroundColor: "#f8eedf",
+      skipFonts: true,
+      width: 1080,
+      height: node.scrollHeight,
+      style: {
+        transform: "none",
+        margin: "0",
+        width: "1080px",
+        minWidth: "1080px"
+      }
+    });
+    return dataUrl;
+  } finally {
+    node.classList.remove("captureMode");
+  }
 }
 
 function openImageInNewTab(dataUrl) {
@@ -1519,23 +1577,28 @@ function dataUrlToFile(dataUrl, filename) {
 async function makeNewsletterDataUrl() {
   const node = document.getElementById("newsletter");
 
-  // Temporarily force the original newsletter size during capture.
-  const oldTransform = node.style.transform;
-  const oldMargin = node.style.margin;
-  node.style.transform = "none";
-  node.style.margin = "0";
+  node.classList.add("captureMode");
+  await waitForImages(node);
+  await new Promise(resolve => setTimeout(resolve, 250));
 
   try {
     const dataUrl = await htmlToImage.toPng(node, {
       pixelRatio: 1,
       cacheBust: true,
       backgroundColor: "#f8eedf",
-      skipFonts: true
+      skipFonts: true,
+      width: 1080,
+      height: node.scrollHeight,
+      style: {
+        transform: "none",
+        margin: "0",
+        width: "1080px",
+        minWidth: "1080px"
+      }
     });
     return dataUrl;
   } finally {
-    node.style.transform = oldTransform;
-    node.style.margin = oldMargin;
+    node.classList.remove("captureMode");
   }
 }
 
