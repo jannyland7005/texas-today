@@ -227,6 +227,8 @@
       object-fit: cover;
       border-radius: 22px;
       border: 2px solid #efe1cf;
+      display: block;
+      background: #fffdf8;
     }
     .photoGrid.one img { height: 440px; }
     .healthGrid {
@@ -407,9 +409,14 @@
         gap: 8px;
       }
       .photoGrid img {
-        height: 140px;
-        border-radius: 14px;
-      }
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 22px;
+      border: 2px solid #efe1cf;
+      display: block;
+      background: #fffdf8;
+    }
       .photoGrid.one img {
         height: 240px;
       }
@@ -489,7 +496,7 @@
     <aside class="panel">
       <h1>텍사스, 오늘 생성기</h1>
       <p>날짜, 사진, 설명을 넣고 가족 뉴스레터 이미지를 공유하세요.</p>
-      <div class="installNote">휴대폰에서 이 주소를 연 뒤 “홈 화면에 추가”를 하면 앱처럼 사용할 수 있습니다.<br><span id="appVersion">모바일 레이아웃 수정판 v5</span></div>
+      <div class="installNote">휴대폰에서 이 주소를 연 뒤 “홈 화면에 추가”를 하면 앱처럼 사용할 수 있습니다.<br><span id="appVersion">사진 업로드 수정판 v6</span></div>
 
       <label>날짜</label>
       <input id="dateInput" type="date" />
@@ -502,17 +509,17 @@
 
       <label>사진 업로드</label>
       <input id="photoInput" type="file" accept="image/*" multiple />
-      <p class="hint">휴대폰에서는 사진 앨범에서 선택하거나 카메라로 바로 촬영할 수 있습니다.</p>
+      <p class="hint">
+        “결과물 다른 앱으로 공유하기”를 누르면 카카오톡, 문자, 이메일 등으로 이미지를 공유할 수 있습니다.
+      </p>
 
       <div class="row">
         <button type="button" class="secondary" id="regenBtn">날짜 seed로 다시 생성</button>
-        <button type="button" class="primary" id="downloadBtn">이미지 저장</button>
       </div>
       <button type="button" class="secondary" id="shareBtn">휴대폰에서 사진으로 공유/저장</button>
 
       <p class="hint">
-        휴대폰에서는 “결과물 다른 앱으로 공유하기”를 누르면 카카오톡, 문자, 이메일 등으로 전송할 수 있습니다.
-        iPhone/Android 모두 https 주소에서 가장 안정적으로 작동합니다.
+        “결과물 다른 앱으로 공유하기”를 누르면 카카오톡, 문자, 이메일 등으로 이미지를 공유할 수 있습니다.
       </p>
       <p class="hint" id="saveStatus" style="font-weight:700;"></p>
     </aside>
@@ -1575,9 +1582,15 @@ function render() {
     `${h.source}; CDC Older Adult Physical Activity Guidelines. 개인 건강 상태에 따라 의사 상담이 필요할 수 있습니다.`;
 }
 
+let currentPhotoObjectUrls = [];
+
 function handlePhotos(files) {
   const grid = document.getElementById("photoGrid");
   grid.innerHTML = "";
+
+  currentPhotoObjectUrls.forEach(url => URL.revokeObjectURL(url));
+  currentPhotoObjectUrls = [];
+
   const selected = Array.from(files || []).slice(0, 4);
   grid.className = selected.length <= 1 ? "photoGrid one" : "photoGrid";
 
@@ -1587,15 +1600,15 @@ function handlePhotos(files) {
   }
 
   selected.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => img.dataset.loaded = "true";
-      img.onerror = () => img.dataset.loaded = "error";
-      img.src = e.target.result;
-      grid.appendChild(img);
-    };
-    reader.readAsDataURL(file);
+    const url = URL.createObjectURL(file);
+    currentPhotoObjectUrls.push(url);
+
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = "업로드한 가족 사진";
+    img.decoding = "sync";
+    img.loading = "eager";
+    grid.appendChild(img);
   });
 }
 
@@ -1604,37 +1617,18 @@ function waitForImages(container) {
   return Promise.all(images.map(img => {
     if (img.complete && img.naturalWidth > 0) return Promise.resolve();
     return new Promise(resolve => {
-      img.onload = () => resolve();
-      img.onerror = () => resolve();
-      setTimeout(resolve, 2000);
+      const done = () => resolve();
+      img.addEventListener("load", done, { once: true });
+      img.addEventListener("error", done, { once: true });
+      setTimeout(done, 3000);
     });
   }));
-}
-
-function setSaveStatus(message) {
-  const el = document.getElementById("saveStatus");
-  if (el) el.textContent = message || "";
-}
-
-function isMobileDevice() {
-  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
-}
-
-function dataUrlToBlob(dataUrl) {
-  const parts = dataUrl.split(",");
-  const mimeMatch = parts[0].match(/:(.*?);/);
-  const mime = mimeMatch ? mimeMatch[1] : "image/png";
-  const binary = atob(parts[1]);
-  const len = binary.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
-  return new Blob([bytes], { type: mime });
 }
 
 async function makeNewsletterDataUrl() {
   const node = document.getElementById("newsletter");
   await waitForImages(node);
-  await new Promise(resolve => setTimeout(resolve, 300));
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
   const rect = node.getBoundingClientRect();
   return await htmlToImage.toPng(node, {
@@ -1683,7 +1677,7 @@ function dataUrlToFile(dataUrl, filename) {
 async function makeNewsletterDataUrl() {
   const node = document.getElementById("newsletter");
   await waitForImages(node);
-  await new Promise(resolve => setTimeout(resolve, 300));
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
   const rect = node.getBoundingClientRect();
   return await htmlToImage.toPng(node, {
