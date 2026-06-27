@@ -1,0 +1,1610 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>텍사스, 오늘</title>
+  <meta name="theme-color" content="#8d6748" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+  <style>
+    :root {
+      --bg: #f7efe3;
+      --paper: #fffdf8;
+      --ink: #2c2925;
+      --muted: #6b6258;
+      --line: #e9dccb;
+      --accent: #8d6748;
+      --accent-soft: #f1dfc9;
+      --green: #51745a;
+      --blue: #566f91;
+      --danger: #9a5a4f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f4f1ec;
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    .app {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .panel {
+      background: white;
+      border: 1px solid #e5dfd7;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.06);
+      position: sticky;
+      top: 18px;
+    }
+    .panel h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+      letter-spacing: -0.04em;
+    }
+    .panel p {
+      margin: 0 0 16px;
+      color: #6b6258;
+      font-size: 14px;
+    }
+    label {
+      display: block;
+      margin: 16px 0 6px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid #d9d1c7;
+      border-radius: 12px;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 15px;
+      background: #fffdfb;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-family: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 14px;
+    }
+    .primary { background: var(--accent); color: white; }
+    .secondary { background: #eee5da; color: #3f352d; }
+    .sharePreview {
+      margin-top: 12px;
+      border: 1px solid #e5dfd7;
+      border-radius: 14px;
+      padding: 12px;
+      background: #fffdf8;
+      display: none;
+    }
+    .sharePreview img {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid #eadcc9;
+    }
+    .installNote {
+      background: #fff7ec;
+      border: 1px solid #eadcc9;
+      border-radius: 14px;
+      padding: 12px;
+      color: #6b6258;
+      font-size: 13px;
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+    .hint {
+      font-size: 12px !important;
+      color: #85776b !important;
+      margin-top: 10px !important;
+    }
+    .previewWrap {
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      padding-bottom: 30px;
+    }
+    #newsletter {
+      width: 1080px;
+      min-height: 1920px;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.9), transparent 320px),
+        linear-gradient(180deg, #f8eedf, #fff9ef 45%, #f5eadb);
+      padding: 56px 58px;
+      color: var(--ink);
+      transform-origin: top center;
+      box-shadow: 0 18px 60px rgba(0,0,0,.18);
+      border-radius: 8px;
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+    .title {
+      font-size: 54px;
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.05em;
+      margin: 0;
+    }
+    .dateBadge {
+      background: var(--paper);
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      padding: 14px 24px;
+      font-size: 24px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .subtitle {
+      margin-top: 10px;
+      font-size: 25px;
+      color: var(--muted);
+      letter-spacing: -0.02em;
+    }
+    .card {
+      background: rgba(255,253,248,.93);
+      border: 2px solid var(--line);
+      border-radius: 28px;
+      padding: 30px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 22px rgba(93,62,29,.07);
+    }
+    .sectionHead {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .icon {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: var(--accent-soft);
+      font-size: 30px;
+    }
+    h2 {
+      margin: 0;
+      font-size: 33px;
+      letter-spacing: -0.04em;
+      line-height: 1.22;
+    }
+    .bodyText {
+      font-size: 27px;
+      line-height: 1.72;
+      margin: 0;
+      letter-spacing: -0.025em;
+      word-break: keep-all;
+    }
+    .smallText {
+      font-size: 22px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 8px 0 0;
+      word-break: keep-all;
+    }
+    .photoGrid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .photoGrid.one { grid-template-columns: 1fr; }
+    .photoGrid img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 22px;
+      border: 2px solid #efe1cf;
+    }
+    .photoGrid.one img { height: 440px; }
+    .healthGrid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .texasBox {
+      border-radius: 24px;
+      padding: 24px;
+      background: #f7efe3;
+      border: 1px solid #e8d9c7;
+      font-size: 25px;
+      line-height: 1.62;
+      word-break: keep-all;
+    }
+    .miniBox {
+      border-radius: 22px;
+      padding: 22px;
+      background: #fbf5ec;
+      border: 1px solid #eadcc9;
+    }
+    .miniBox h3 {
+      font-size: 25px;
+      margin: 0 0 10px;
+      letter-spacing: -0.03em;
+    }
+    .miniBox ul {
+      margin: 0;
+      padding-left: 26px;
+      font-size: 26px;
+      line-height: 1.58;
+      word-break: keep-all;
+    }
+    .quote {
+      font-size: 29px;
+      line-height: 1.65;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      word-break: keep-all;
+    }
+    .quoteBy {
+      margin-top: 10px;
+      font-size: 23px;
+      color: var(--muted);
+    }
+    .exercise {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .move {
+      display: grid;
+      grid-template-columns: 62px 1fr;
+      gap: 16px;
+      align-items: start;
+      background: #f8f2e9;
+      border: 1px solid #e7d8c6;
+      border-radius: 22px;
+      padding: 18px;
+    }
+    .num {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      background: white;
+      border: 2px solid #e6d5c2;
+      border-radius: 18px;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .moveTitle {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      letter-spacing: -0.03em;
+    }
+    .moveDesc {
+      font-size: 23px;
+      color: #5e554c;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: end;
+      font-size: 18px;
+      color: #75695f;
+      padding: 0 8px;
+    }
+    .source {
+      max-width: 780px;
+      line-height: 1.45;
+    }
+    .watermark {
+      font-weight: 800;
+      color: #9a816b;
+    }
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr; padding: 12px; }
+      .panel { position: static; }
+      .row { grid-template-columns: 1fr; }
+      button { font-size: 16px; }
+      input, textarea { font-size: 16px; }
+      #newsletter { transform: scale(.35); margin: -610px 0; }
+      .previewWrap { min-height: 720px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="panel">
+      <h1>텍사스, 오늘 생성기</h1>
+      <p>날짜, 사진, 설명을 넣고 가족 뉴스레터 이미지를 공유하세요.</p>
+      <div class="installNote">휴대폰에서 이 주소를 연 뒤 “홈 화면에 추가”를 하면 앱처럼 사용할 수 있습니다.</div>
+
+      <label>날짜</label>
+      <input id="dateInput" type="date" />
+
+      <label>오늘의 가족 소식</label>
+      <textarea id="familyText">오늘 재인이는 공원에서 신나게 뛰어놀았어요. 집에 돌아와서는 엄마 아빠에게 하루 이야기를 재잘재잘 들려주었습니다.</textarea>
+
+      <label>부제 문구</label>
+      <input id="subtitleInput" type="text" value="재인이네 가족이 보내는 하루 소식" />
+
+      <label>사진 업로드</label>
+      <input id="photoInput" type="file" accept="image/*" multiple />
+      <p class="hint">휴대폰에서는 사진 앨범에서 선택하거나 카메라로 바로 촬영할 수 있습니다.</p>
+
+      <div class="row">
+        <button type="button" class="secondary" id="regenBtn">날짜 seed로 다시 생성</button>
+        <button type="button" class="primary" id="downloadBtn">이미지 저장</button>
+      </div>
+      <button type="button" class="secondary" id="shareBtn">휴대폰에서 사진으로 공유/저장</button>
+
+      <p class="hint">
+        휴대폰에서는 “결과물 다른 앱으로 공유하기”를 누르면 카카오톡, 문자, 이메일 등으로 전송할 수 있습니다.
+        iPhone/Android 모두 https 주소에서 가장 안정적으로 작동합니다.
+      </p>
+      <p class="hint" id="saveStatus" style="font-weight:700;"></p>
+    </aside>
+
+    <main class="previewWrap">
+      <section id="newsletter">
+        <div class="top">
+          <div>
+            <h1 class="title">텍사스, 오늘</h1>
+            <div class="subtitle" id="subtitleOut">재인이네 가족이 보내는 하루 소식</div>
+          </div>
+          <div class="dateBadge" id="prettyDate">2026년 6월 6일</div>
+        </div>
+
+        <article class="card">
+          <div class="sectionHead">
+            <div class="icon">🏡</div>
+            <h2>오늘의 우리 소식</h2>
+          </div>
+          <div id="photoGrid" class="photoGrid one"></div>
+          <p class="bodyText" id="familyOut"></p>
+        </article>
+
+        <article class="card">
+          <div class="sectionHead">
+            <div class="icon">🥣</div>
+            <h2>오늘의 건강 상식</h2>
+          </div>
+          <p class="bodyText" id="healthLead"></p>
+          <div class="healthGrid" style="margin-top:18px;">
+            <div class="miniBox">
+              <h3>오늘 먹으면 좋은 메뉴</h3>
+              <ul id="goodFoods"></ul>
+            </div>
+            <div class="miniBox">
+              <h3>오늘 조심할 메뉴</h3>
+              <ul id="avoidFoods"></ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="sectionHead">
+            <div class="icon">🌿</div>
+            <h2>오늘의 생활 습관</h2>
+          </div>
+          <p class="bodyText" id="habitOut"></p>
+        </article>
+
+        <article class="card">
+          <div class="sectionHead">
+            <div class="icon">🕯️</div>
+            <h2>마음 습관</h2>
+          </div>
+          <div class="quote" id="quoteOut"></div>
+          <div class="quoteBy" id="quoteBy"></div>
+          <p class="smallText" id="quoteNote"></p>
+        </article>
+
+        <article class="card">
+          <div class="sectionHead">
+            <div class="icon">🪑</div>
+            <h2>하루 운동</h2>
+          </div>
+          <div class="exercise" id="exerciseOut"></div>
+          <p class="smallText">통증, 어지럼, 숨참이 있으면 즉시 멈추고, 지팡이·의자 등 안전한 지지대를 사용하세요.</p>
+        </article>
+
+        <div class="footer">
+          <div class="source" id="sourceOut"></div>
+          <div class="watermark">from 미국 가족</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script>
+
+const healthTips = [
+  {
+    "lead": "속이 편한 하루를 위해서는 따뜻하고 부드러운 한식 메뉴가 좋습니다.",
+    "good": [
+      "소고기무국과 밥",
+      "계란찜",
+      "애호박볶음",
+      "두부조림"
+    ],
+    "avoid": [
+      "불닭볶음면",
+      "매운 닭발",
+      "짬뽕 국물",
+      "떡볶이 국물"
+    ],
+    "source": "참고: NIA Healthy Eating, MedlinePlus Nutrition for Older Adults"
+  },
+  {
+    "lead": "혈압이 걱정되는 날에는 국물과 젓갈류를 줄이고 담백한 메뉴를 고르는 것이 좋습니다.",
+    "good": [
+      "맑은 북어국",
+      "고등어구이",
+      "가지나물",
+      "보리밥"
+    ],
+    "avoid": [
+      "라면과 라면 국물",
+      "젓갈 많이 올린 밥상",
+      "부대찌개",
+      "짠 장아찌"
+    ],
+    "source": "참고: American Heart Association Sodium Guidance, NIA Healthy Eating"
+  },
+  {
+    "lead": "단백질은 근육을 지키는 데 중요하므로 매끼 부드러운 단백질 반찬을 하나씩 챙기면 좋습니다.",
+    "good": [
+      "닭곰탕",
+      "연두부 간장소스",
+      "달걀말이",
+      "삼치구이"
+    ],
+    "avoid": [
+      "밥만 먹는 식사",
+      "국수만 한 그릇",
+      "빵과 커피만 먹기",
+      "과자와 떡으로 끼니 때우기"
+    ],
+    "source": "참고: MedlinePlus Older Adult Nutrition, NIA Nutrition"
+  },
+  {
+    "lead": "소화기관이 약한 날에는 기름기 많은 음식보다 삶거나 찐 음식이 편합니다.",
+    "good": [
+      "맑은 미역국",
+      "찐 감자",
+      "찐 단호박",
+      "두부된장국"
+    ],
+    "avoid": [
+      "후라이드치킨",
+      "돈가스",
+      "탕수육",
+      "기름진 전"
+    ],
+    "source": "참고: MedlinePlus Nutrition for Older Adults"
+  },
+  {
+    "lead": "수분이 부족하면 피로감과 어지럼이 커질 수 있어 음식과 물로 나누어 보충하는 것이 좋습니다.",
+    "good": [
+      "맑은 콩나물국",
+      "오이무침 조금",
+      "배 한두 조각",
+      "보리차"
+    ],
+    "avoid": [
+      "커피만 계속 마시기",
+      "탄산음료",
+      "짠 컵라면",
+      "밤늦게 물 몰아 마시기"
+    ],
+    "source": "참고: NIA Healthy Eating and Nutrition"
+  },
+  {
+    "lead": "아침 식사는 하루 컨디션을 좌우하므로 너무 무겁지 않게 따뜻한 메뉴로 시작하면 좋습니다.",
+    "good": [
+      "야채죽",
+      "누룽지탕",
+      "달걀국",
+      "바나나 반 개와 요거트"
+    ],
+    "avoid": [
+      "빈속에 진한 커피",
+      "차가운 아이스크림",
+      "매운 김치찌개로 아침 시작",
+      "공복에 과자"
+    ],
+    "source": "참고: NIA Healthy Eating"
+  },
+  {
+    "lead": "장 건강을 위해서는 너무 자극적인 음식보다 익힌 채소와 부드러운 곡류가 좋습니다.",
+    "good": [
+      "시래기된장국",
+      "무나물",
+      "양배추찜",
+      "현미를 조금 섞은 밥"
+    ],
+    "avoid": [
+      "매운 곱창전골",
+      "마라탕",
+      "고추장 많이 넣은 비빔국수",
+      "차가운 냉면을 급하게 먹기"
+    ],
+    "source": "참고: MedlinePlus Digestive Health, NIA Nutrition"
+  },
+  {
+    "lead": "뼈 건강을 생각하면 단백질과 칼슘을 함께 챙길 수 있는 메뉴가 도움이 됩니다.",
+    "good": [
+      "멸치볶음 조금",
+      "두부김치에서 두부 위주",
+      "우유가 맞으면 따뜻한 우유",
+      "들깨미역국"
+    ],
+    "avoid": [
+      "술안주로 짠 마른안주",
+      "탄산음료 많이 마시기",
+      "식사 거르기",
+      "짠 국물에 밥 말아먹기"
+    ],
+    "source": "참고: NIH Osteoporosis and Related Bone Diseases, NIA Nutrition"
+  },
+  {
+    "lead": "입맛이 없을 때도 너무 자극적인 음식으로 입맛을 깨우기보다 담백한 메뉴를 조금씩 드시는 편이 좋습니다.",
+    "good": [
+      "닭죽",
+      "계란찜밥",
+      "조기구이",
+      "감자조림"
+    ],
+    "avoid": [
+      "매운 낙지볶음",
+      "불고기 양념을 아주 짜게 먹기",
+      "김치전 많이 먹기",
+      "초고추장 듬뿍 회무침"
+    ],
+    "source": "참고: MedlinePlus Nutrition for Older Adults"
+  },
+  {
+    "lead": "당 섭취가 걱정되는 날에는 달콤한 간식보다 식사 메뉴를 든든하게 챙기는 것이 좋습니다.",
+    "good": [
+      "잡곡밥 조금과 생선구이",
+      "두부버섯전골",
+      "콩나물밥",
+      "삶은 달걀"
+    ],
+    "avoid": [
+      "달달한 믹스커피 여러 잔",
+      "케이크",
+      "약과와 한과 많이 먹기",
+      "단팥빵으로 끼니 대체"
+    ],
+    "source": "참고: CDC Diabetes Healthy Eating, NIA Nutrition"
+  },
+  {
+    "lead": "저녁에는 소화가 쉬운 메뉴를 적당히 먹고 늦은 야식은 피하는 것이 좋습니다.",
+    "good": [
+      "맑은 순두부국",
+      "무국",
+      "가지볶음",
+      "흰살생선찜"
+    ],
+    "avoid": [
+      "밤늦은 족발",
+      "야식 치킨",
+      "매운 라면",
+      "늦은 시간 떡볶이"
+    ],
+    "source": "참고: MedlinePlus Healthy Aging"
+  },
+  {
+    "lead": "기운이 없는 날에는 탄수화물만 먹기보다 단백질과 채소를 함께 먹는 구성이 좋습니다.",
+    "good": [
+      "불고기少와 상추쌈",
+      "두부조림과 밥",
+      "닭가슴살 장조림",
+      "계란국"
+    ],
+    "avoid": [
+      "흰죽만 계속 먹기",
+      "떡만 먹기",
+      "식빵과 잼만 먹기",
+      "감자칩"
+    ],
+    "source": "참고: NIA Healthy Eating"
+  },
+  {
+    "lead": "씹기 불편한 날에는 부드러운 메뉴를 선택하되 영양이 부족하지 않도록 신경 쓰면 좋습니다.",
+    "good": [
+      "순두부찌개를 맵지 않게",
+      "부드러운 생선찜",
+      "소고기야채죽",
+      "호박죽"
+    ],
+    "avoid": [
+      "질긴 갈비",
+      "딱딱한 오징어채",
+      "마른 멸치 과하게 먹기",
+      "딱딱한 견과류 한꺼번에 먹기"
+    ],
+    "source": "참고: MedlinePlus Senior Nutrition"
+  },
+  {
+    "lead": "심장 건강을 위해서는 튀김보다는 굽거나 찌는 조리법이 더 부담이 적습니다.",
+    "good": [
+      "고등어구이",
+      "닭안심구이",
+      "두부구이",
+      "버섯볶음"
+    ],
+    "avoid": [
+      "감자튀김",
+      "튀김우동",
+      "새우튀김 많이 먹기",
+      "기름 많은 곱창"
+    ],
+    "source": "참고: American Heart Association Healthy Eating"
+  },
+  {
+    "lead": "나트륨을 줄이려면 메뉴 선택만큼 국물 섭취량을 조절하는 것이 중요합니다.",
+    "good": [
+      "건더기 위주의 된장국",
+      "싱겁게 끓인 소고기뭇국",
+      "배추된장무침",
+      "두부부침"
+    ],
+    "avoid": [
+      "찌개 국물에 밥 말기",
+      "라면 국물 끝까지 마시기",
+      "짠 칼국수 국물",
+      "짬뽕 국물"
+    ],
+    "source": "참고: CDC Sodium, NIA Healthy Eating"
+  },
+  {
+    "lead": "변비가 걱정되는 날에는 수분과 익힌 채소를 함께 챙기는 식사가 도움이 됩니다.",
+    "good": [
+      "양배추된장국",
+      "무나물",
+      "고구마 반 개",
+      "미지근한 물"
+    ],
+    "avoid": [
+      "물 없이 떡 많이 먹기",
+      "과자 위주 간식",
+      "고기만 많은 식사",
+      "술과 짠 안주"
+    ],
+    "source": "참고: MedlinePlus Constipation, NIA Nutrition"
+  },
+  {
+    "lead": "위가 예민하면 신맛·매운맛·기름진 맛을 줄이고 편안한 메뉴를 고르는 것이 좋습니다.",
+    "good": [
+      "계란찜",
+      "감자국",
+      "흰살생선찜",
+      "누룽지탕"
+    ],
+    "avoid": [
+      "매운 김치찌개",
+      "식초 많이 넣은 냉면",
+      "초고추장 듬뿍 무침",
+      "튀긴 만두"
+    ],
+    "source": "참고: MedlinePlus Digestive Health"
+  },
+  {
+    "lead": "면역과 회복을 위해서는 한 가지 음식에 치우치지 않고 여러 색의 식재료를 부드럽게 먹는 것이 좋습니다.",
+    "good": [
+      "소고기버섯국",
+      "당근감자조림",
+      "시금치나물",
+      "두부계란국"
+    ],
+    "avoid": [
+      "편의점 도시락만 자주 먹기",
+      "가공육 많은 샌드위치",
+      "컵라면",
+      "짠 햄 반찬"
+    ],
+    "source": "참고: NIA Healthy Eating"
+  },
+  {
+    "lead": "간식은 양을 정해두고 식사를 방해하지 않는 정도로 먹는 것이 좋습니다.",
+    "good": [
+      "사과 몇 조각",
+      "삶은 고구마 반 개",
+      "플레인 요거트",
+      "따뜻한 보리차"
+    ],
+    "avoid": [
+      "과일을 큰 그릇으로 많이 먹기",
+      "단 음료",
+      "케이크 한 조각 이상",
+      "밤늦은 과자"
+    ],
+    "source": "참고: MedlinePlus Older Adult Nutrition"
+  },
+  {
+    "lead": "무더운 날에는 짠 음식과 카페인을 줄이고 수분이 있는 식사를 챙기는 것이 좋습니다.",
+    "good": [
+      "오이냉국을 싱겁게",
+      "맑은 닭국",
+      "수박 몇 조각",
+      "콩나물국"
+    ],
+    "avoid": [
+      "짠 냉면 육수 많이 마시기",
+      "아이스커피만 마시기",
+      "매운 찌개",
+      "소금 많이 찍은 토마토"
+    ],
+    "source": "참고: CDC Heat and Older Adults, NIA Nutrition"
+  },
+  {
+    "lead": "추운 날에는 따뜻한 국과 부드러운 반찬으로 몸을 천천히 데우는 식사가 좋습니다.",
+    "good": [
+      "따뜻한 설렁탕에서 국물은 적게",
+      "황태해장국",
+      "두부버섯국",
+      "계란국"
+    ],
+    "avoid": [
+      "뜨거운 국물 급하게 마시기",
+      "짠 탕국 많이 먹기",
+      "기름진 전골",
+      "술로 몸 데우기"
+    ],
+    "source": "참고: NIA Healthy Eating"
+  },
+  {
+    "lead": "식후 혈당이 걱정된다면 밥 양을 조금 줄이고 반찬 구성을 알차게 하는 것이 좋습니다.",
+    "good": [
+      "생선구이와 나물",
+      "두부조림과 잡곡밥 조금",
+      "닭가슴살무침",
+      "버섯볶음"
+    ],
+    "avoid": [
+      "흰밥 큰 공기",
+      "국수 곱빼기",
+      "떡국 많이 먹기",
+      "달콤한 식혜 많이 마시기"
+    ],
+    "source": "참고: CDC Diabetes Meal Planning"
+  },
+  {
+    "lead": "입이 마르거나 목 넘김이 불편한 날에는 촉촉하고 부드러운 메뉴가 편합니다.",
+    "good": [
+      "부드러운 계란찜",
+      "맑은 만둣국에서 국물 적당히",
+      "순두부국",
+      "소고기죽"
+    ],
+    "avoid": [
+      "마른 크래커 많이 먹기",
+      "딱딱한 빵",
+      "마른 오징어",
+      "짠 육포"
+    ],
+    "source": "참고: MedlinePlus Senior Nutrition"
+  },
+  {
+    "lead": "외식하는 날에는 메뉴보다 양과 국물, 소스 조절이 건강에 큰 차이를 만듭니다.",
+    "good": [
+      "비빔밥은 고추장 적게",
+      "쌀국수는 국물 적게",
+      "생선구이 정식",
+      "순두부는 덜 맵게"
+    ],
+    "avoid": [
+      "짜장면 곱빼기",
+      "탕수육 소스 듬뿍",
+      "국밥 국물 완식",
+      "매운 찌개에 밥 말기"
+    ],
+    "source": "참고: American Heart Association Dining Out Tips"
+  },
+  {
+    "lead": "오늘은 위와 장을 쉬게 한다는 마음으로 자극을 줄인 한 끼를 선택해보세요.",
+    "good": [
+      "호박죽",
+      "감자계란국",
+      "두부전",
+      "부드러운 시금치나물"
+    ],
+    "avoid": [
+      "매운 순대볶음",
+      "곱창전골",
+      "김치찌개를 아주 맵게",
+      "차가운 맥주와 튀김"
+    ],
+    "source": "참고: MedlinePlus Digestive Health, NIA Healthy Eating"
+  }
+];
+const lifestyleTips = [
+  "식사 후 바로 눕지 말고 집 안이나 복도에서 5분만 천천히 걸어보세요. 소화에도 좋고 오후의 몸 처짐을 줄이는 데 도움이 됩니다.",
+  "아침에 일어나면 커튼을 열고 햇빛을 먼저 보세요. 몸의 시계가 깨어나면서 밤잠 리듬도 조금씩 안정됩니다.",
+  "물은 한 번에 많이 마시기보다 작은 컵으로 여러 번 나누어 마시는 편이 좋습니다. 특히 더운 날에는 갈증을 느끼기 전에 조금씩 드세요.",
+  "약을 드신다면 식탁이나 물컵 옆에 체크 메모를 두세요. 이미 먹었는지 헷갈리는 일을 줄이는 데 도움이 됩니다.",
+  "화장실이나 현관처럼 미끄러지기 쉬운 곳에는 작은 물기라도 바로 닦아주세요. 낙상 예방은 가장 중요한 생활 건강 습관입니다.",
+  "전화기를 너무 멀리 두지 말고 자주 머무는 곳 가까이에 두세요. 갑자기 도움이 필요할 때 바로 연락할 수 있어야 합니다.",
+  "하루에 한 번은 창문을 열어 짧게 환기해보세요. 실내 공기가 바뀌면 머리도 한결 맑아집니다.",
+  "잠들기 전에는 뉴스를 오래 보기보다 조용한 음악이나 가벼운 독서로 마무리해보세요. 마음이 가라앉아 잠들기 편해집니다.",
+  "외출할 때는 급하게 걷지 말고 신발 뒤꿈치가 잘 맞는지 확인하세요. 편한 신발이 무릎과 허리를 지켜줍니다.",
+  "집 안 조명은 너무 어둡지 않게 유지하세요. 특히 밤에 화장실 갈 때 켤 수 있는 작은 등을 준비하면 좋습니다.",
+  "오래 앉아 있었다면 한 시간에 한 번은 일어나 어깨와 허리를 펴보세요. 몸이 굳는 것을 막는 데 도움이 됩니다.",
+  "식사는 가능하면 같은 시간대에 드세요. 일정한 식사 리듬은 소화와 수면 리듬을 안정시키는 데 도움이 됩니다.",
+  "냉장고 안 반찬은 오래된 것부터 확인하고, 냄새가 이상하면 아깝더라도 드시지 않는 편이 안전합니다.",
+  "병원 예약이나 복용 약 이름은 작은 수첩에 적어두세요. 진료 때 훨씬 정확하게 설명할 수 있습니다.",
+  "외출 전에는 물 한 모금, 화장실, 휴대폰 배터리를 확인하세요. 작은 준비가 하루를 훨씬 편하게 만듭니다.",
+  "청소는 한 번에 몰아서 하기보다 오늘은 식탁, 내일은 현관처럼 나누어 하세요. 무리하지 않는 것이 오래 가는 비결입니다.",
+  "낮잠은 너무 길지 않게 20~30분 정도만 자는 것이 좋습니다. 너무 오래 자면 밤잠이 흐트러질 수 있습니다.",
+  "갑자기 일어날 때는 먼저 앉아서 한숨 돌린 뒤 천천히 서세요. 어지럼과 넘어짐을 줄이는 데 도움이 됩니다.",
+  "오늘 입은 옷이 너무 덥거나 춥지 않은지 자주 살펴보세요. 체온 조절은 나이가 들수록 더 중요합니다.",
+  "가벼운 집안일도 운동이 됩니다. 다만 무거운 물건은 허리를 숙여 들지 말고 가까이 붙여 천천히 드세요.",
+  "손을 자주 씻고, 외출 후에는 얼굴을 만지기 전에 먼저 손부터 씻어주세요. 감기와 감염 예방의 기본입니다.",
+  "달력에 오늘 한 일을 하나만 표시해보세요. 작은 기록이 하루를 더 또렷하고 뿌듯하게 만들어줍니다.",
+  "전화나 문자로 가까운 사람에게 안부를 전해보세요. 짧은 대화도 마음 건강에는 큰 보탬이 됩니다.",
+  "식탁 위에는 짠 반찬을 여러 개 올리기보다 한두 가지로 줄여보세요. 자연스럽게 나트륨 섭취를 줄일 수 있습니다.",
+  "몸이 평소와 다르게 불편하면 참지 말고 증상과 시간을 적어두세요. 병원에 갈 때 중요한 단서가 됩니다."
+];
+const mindTips = [
+  {
+    "text": "오늘 하루는 완벽하지 않아도 괜찮습니다. 편안히 지나간 하루도 충분히 좋은 하루입니다.",
+    "by": "부모님께 드리는 한마디",
+    "note": "잘하려는 마음보다 편안히 지내는 마음을 먼저 챙겨보세요."
+  },
+  {
+    "text": "멀리 있어도 마음은 매일 가까이에 있습니다. 오늘도 생각하고 감사하고 있습니다.",
+    "by": "미국 가족",
+    "note": "사진 한 장, 짧은 소식 하나에도 마음을 담아 보냅니다."
+  },
+  {
+    "text": "걱정이 올라오면 먼저 숨을 천천히 세 번 쉬어보세요. 마음은 숨을 따라 조금씩 조용해집니다.",
+    "by": "오늘의 마음 습관",
+    "note": "큰 해결보다 작은 안정이 먼저일 때가 많습니다."
+  },
+  {
+    "text": "오늘 할 수 있는 일 하나만 해도 충분합니다. 작은 일도 매일 이어지면 큰 힘이 됩니다.",
+    "by": "오늘의 마음 습관",
+    "note": "해야 할 일을 전부 떠올리기보다 지금 가능한 하나에 집중해보세요."
+  },
+  {
+    "text": "몸이 느려지는 날은 마음도 천천히 가면 됩니다. 서두르지 않아도 하루는 잘 지나갑니다.",
+    "by": "부모님께 드리는 한마디",
+    "note": "쉼은 게으름이 아니라 회복입니다."
+  },
+  {
+    "text": "고마운 일을 하나 떠올리면 마음의 방향이 조금 바뀝니다. 작은 감사가 하루를 부드럽게 만듭니다.",
+    "by": "오늘의 마음 습관",
+    "note": "식사, 햇빛, 전화 한 통처럼 가까운 것부터 떠올려보세요."
+  },
+  {
+    "text": "지나간 일은 오늘의 마음을 너무 오래 붙잡지 못하게 해주세요. 오늘은 오늘의 평안이 있습니다.",
+    "by": "마음챙김의 취지",
+    "note": "생각이 길어질 때는 눈앞의 사물 하나를 천천히 바라보세요."
+  },
+  {
+    "text": "가족은 같은 곳에 있어야만 가까운 것이 아닙니다. 서로를 생각하는 마음이 거리를 좁혀줍니다.",
+    "by": "미국 가족",
+    "note": "오늘도 안부를 전하는 마음으로 이 소식을 보냅니다."
+  },
+  {
+    "text": "마음이 복잡한 날에는 따뜻한 차 한 잔을 천천히 마셔보세요. 속도만 늦춰도 마음이 조금 쉬어갑니다.",
+    "by": "오늘의 마음 습관",
+    "note": "차를 마시는 동안만큼은 걱정을 잠깐 내려놓아도 됩니다."
+  },
+  {
+    "text": "오늘도 잘 버텨낸 것만으로 충분합니다. 하루를 무사히 보낸 자신에게 수고했다고 말해주세요.",
+    "by": "부모님께 드리는 한마디",
+    "note": "스스로에게 하는 다정한 말도 마음 건강에 도움이 됩니다."
+  },
+  {
+    "text": "좋은 날은 크게 웃고, 힘든 날은 조용히 지나가면 됩니다. 모든 날을 이겨낼 필요는 없습니다.",
+    "by": "오늘의 마음 습관",
+    "note": "힘든 감정은 없애려 하기보다 지나가게 두는 것도 방법입니다."
+  },
+  {
+    "text": "재인이가 할머니, 할아버지 이야기를 들으면 반가워합니다. 멀리 있어도 가족 이야기는 매일 이어집니다.",
+    "by": "미국 가족",
+    "note": "아이의 하루에도 부모님이 함께 계십니다."
+  },
+  {
+    "text": "천천히 걷는 사람도 결국 계절을 다 만납니다. 오늘의 속도대로 가셔도 괜찮습니다.",
+    "by": "오늘의 마음 습관",
+    "note": "남과 비교하지 않고 내 몸의 속도를 존중해보세요."
+  },
+  {
+    "text": "불안한 생각이 들면 ‘지금 내가 할 수 있는 것’과 ‘지금은 내려놓을 것’을 나누어보세요.",
+    "by": "오늘의 마음 습관",
+    "note": "구분하는 것만으로도 마음의 부담이 줄어듭니다."
+  },
+  {
+    "text": "오늘 웃을 일이 하나만 있어도 좋은 하루입니다. 작은 웃음도 몸과 마음을 가볍게 합니다.",
+    "by": "부모님께 드리는 한마디",
+    "note": "재미있는 영상이나 가족 사진을 잠깐 보는 것도 좋습니다."
+  },
+  {
+    "text": "사랑은 자주 말할수록 더 선명해집니다. 오늘도 사랑하고 감사드립니다.",
+    "by": "미국 가족",
+    "note": "이 뉴스레터가 짧은 안부 전화처럼 느껴지면 좋겠습니다."
+  },
+  {
+    "text": "마음이 급할 때는 발바닥이 바닥에 닿는 느낌을 느껴보세요. 지금 이 순간으로 돌아오는 연습입니다.",
+    "by": "마음챙김의 취지",
+    "note": "몸의 감각에 집중하면 생각의 소음이 조금 줄어듭니다."
+  },
+  {
+    "text": "나이가 든다는 것은 느려지는 것이 아니라 더 깊어지는 일일 수도 있습니다.",
+    "by": "오늘의 마음 습관",
+    "note": "오늘의 경험과 지혜를 스스로 귀하게 여겨주세요."
+  },
+  {
+    "text": "하루에 한 번은 스스로에게 ‘괜찮다’고 말해주세요. 마음은 다정한 말을 오래 기억합니다.",
+    "by": "부모님께 드리는 한마디",
+    "note": "작은 자기 위로가 불안을 낮추는 데 도움이 됩니다."
+  },
+  {
+    "text": "기다리는 마음이 길어질 때도 우리는 서로를 잊지 않습니다. 좋은 소식과 사진을 계속 보내겠습니다.",
+    "by": "미국 가족",
+    "note": "거리보다 자주 전하는 마음이 더 중요할 때가 있습니다."
+  },
+  {
+    "text": "오늘은 어제보다 조금만 부드럽게 말하고, 조금만 천천히 움직여보세요. 하루의 결이 달라집니다.",
+    "by": "오늘의 마음 습관",
+    "note": "말과 움직임의 속도가 마음의 속도도 낮춰줍니다."
+  },
+  {
+    "text": "걱정이 전부 사실은 아닙니다. 걱정은 마음이 조심하라고 보내는 신호일 때도 있습니다.",
+    "by": "오늘의 마음 습관",
+    "note": "걱정을 믿기 전에 한 번 더 확인해보세요."
+  },
+  {
+    "text": "오늘 드신 따뜻한 밥 한 끼, 마신 물 한 잔, 쉬어간 시간 하나가 모두 건강을 지키는 일입니다.",
+    "by": "부모님께 드리는 한마디",
+    "note": "건강은 큰 결심보다 작은 반복에서 만들어집니다."
+  },
+  {
+    "text": "하늘을 한 번 올려다보는 것만으로도 생각의 방향이 달라질 수 있습니다. 오늘의 하늘을 잠깐 만나보세요.",
+    "by": "오늘의 마음 습관",
+    "note": "창밖을 보는 짧은 시간도 마음의 환기가 됩니다."
+  },
+  {
+    "text": "오늘도 부모님 덕분에 저희 가족이 든든합니다. 늘 감사한 마음으로 하루를 시작합니다.",
+    "by": "미국 가족",
+    "note": "고마운 마음을 자주 전하고 싶습니다."
+  }
+];
+const texasNotes = [
+  "텍사스의 하늘은 넓고 빛이 강해서, 평범한 오후도 사진으로 남기면 작은 여행처럼 보입니다.",
+  "이곳은 차로 이동하는 시간이 많아 동네 풍경도 차창 밖으로 자주 보게 됩니다. 그런 순간에도 한국에 계신 부모님 생각이 납니다.",
+  "텍사스는 날씨가 시원하다가도 금방 더워질 때가 많습니다. 그래서 하루의 시작과 끝 풍경이 꽤 다르게 느껴집니다.",
+  "동네 마트에 가면 한국과 다른 식재료와 큰 포장들이 눈에 띕니다. 미국 생활의 작은 차이들이 매일의 이야기가 됩니다.",
+  "여기서는 해가 길게 남아 저녁에도 밝은 날이 많습니다. 하루가 조금 더 천천히 끝나는 느낌입니다.",
+  "텍사스의 여름은 햇볕이 강해서 잠깐 밖에 나가도 계절이 온몸으로 느껴집니다.",
+  "집 주변의 새소리와 넓은 도로, 낮은 건물들이 이곳 생활의 익숙한 배경이 되어가고 있습니다.",
+  "가끔은 한국의 골목과 시장이 그립지만, 이곳의 넓은 하늘도 이제 우리 가족의 풍경이 되었습니다.",
+  "텍사스에서는 작은 외출도 차를 타고 다녀오는 일이 많습니다. 그래서 가족이 함께 차 안에서 보내는 시간도 소중합니다.",
+  "아침 햇살이 거실에 들어올 때면, 멀리 있어도 오늘 하루를 잘 보내자는 마음이 듭니다.",
+  "동네 공원은 재인이가 뛰어놀기 좋은 공간입니다. 넓은 잔디를 보면 아이가 자라는 시간이 더 또렷하게 느껴집니다.",
+  "여기 하늘은 구름 모양이 크게 보여서, 날씨가 바뀌는 모습도 한눈에 들어옵니다.",
+  "텍사스의 마트와 식당은 규모가 커서 처음에는 낯설었지만, 이제는 그 낯섦도 일상이 되었습니다.",
+  "주말이면 가족 단위로 움직이는 사람들이 많아, 우리도 자연스럽게 가족 시간을 더 챙기게 됩니다.",
+  "한국과 시간이 달라 연락이 쉽지 않을 때도 있지만, 같은 하루를 서로 다른 하늘 아래에서 보내고 있다고 생각합니다.",
+  "이곳의 저녁노을은 색이 진해서 하루를 마무리하는 기분을 특별하게 만들어줍니다.",
+  "비가 오는 날에는 넓은 도로와 낮은 하늘이 더 조용하게 느껴집니다. 집 안에서 보내는 시간이 더 따뜻해집니다.",
+  "미국 생활은 낯선 일도 많지만, 가족이 함께 적응해가는 과정 자체가 매일의 기록이 되고 있습니다.",
+  "텍사스의 계절은 한국과 다르게 느껴질 때가 많습니다. 그래서 부모님께 이곳의 하루를 전하는 일이 더 의미 있게 느껴집니다.",
+  "동네의 평범한 풍경도 부모님께 보여드린다고 생각하면 조금 더 자세히 보게 됩니다.",
+  "재인이가 보는 텍사스는 놀이터, 자동차, 하늘, 가족의 시간으로 채워져 있습니다.",
+  "이곳의 하루 소식을 전하다 보면, 멀리 떨어진 거리도 조금은 가까워지는 것 같습니다.",
+  "한국의 아침과 텍사스의 저녁이 겹치는 시간에는 서로 다른 하루가 이어지는 느낌이 듭니다.",
+  "넓은 주차장, 큰 카트, 긴 도로 같은 것들이 이제는 우리 가족의 미국 생활을 설명하는 작은 장면들입니다.",
+  "오늘도 텍사스에서 보낸 평범한 하루를 한국에 계신 부모님께 작은 편지처럼 전합니다."
+];
+const exerciseSets = [
+  [
+    [
+      "의자 앉았다 일어서기",
+      "팔걸이나 식탁을 가볍게 잡고 천천히 일어섰다가 앉기 5–8회"
+    ],
+    [
+      "발뒤꿈치 들기",
+      "의자 등받이를 잡고 발뒤꿈치를 천천히 들었다 내리기 10회"
+    ],
+    [
+      "목·어깨 풀기",
+      "어깨를 뒤로 천천히 돌리고 목을 좌우로 부드럽게 기울이기"
+    ]
+  ],
+  [
+    [
+      "무릎 들어 올리기",
+      "의자에 앉아 한쪽 무릎씩 천천히 들어 올리기 10회"
+    ],
+    [
+      "벽 짚고 팔굽혀펴기",
+      "벽을 짚고 몸을 천천히 가까이했다 밀기 6–10회"
+    ],
+    [
+      "발목 돌리기",
+      "앉아서 발목을 안쪽·바깥쪽으로 천천히 돌리기"
+    ]
+  ],
+  [
+    [
+      "옆으로 다리 들기",
+      "의자를 잡고 한쪽 다리를 옆으로 살짝 들기 8회"
+    ],
+    [
+      "제자리 걷기",
+      "무릎을 낮게 들고 제자리에서 1분 걷기"
+    ],
+    [
+      "손가락 쥐었다 펴기",
+      "손을 꽉 쥐었다 천천히 펴기 10회"
+    ]
+  ],
+  [
+    [
+      "뒤꿈치-발끝 걷기",
+      "벽 옆에서 천천히 일자로 5–8걸음 걷기"
+    ],
+    [
+      "종아리 스트레칭",
+      "벽을 짚고 한쪽 다리를 뒤로 빼 10초 유지"
+    ],
+    [
+      "깊은 호흡",
+      "코로 천천히 들이마시고 입으로 길게 내쉬기 5회"
+    ]
+  ],
+  [
+    [
+      "앉아서 다리 펴기",
+      "의자에 앉아 한쪽 다리를 펴고 2초 유지 후 내리기"
+    ],
+    [
+      "옆구리 늘리기",
+      "양손을 올리고 몸을 좌우로 천천히 기울이기"
+    ],
+    [
+      "손목 돌리기",
+      "손목을 천천히 돌려 굳은 느낌을 풀어주기"
+    ]
+  ],
+  [
+    [
+      "의자에 앉아 발끝 들기",
+      "발뒤꿈치는 바닥에 두고 발끝만 들어 올리기 10회"
+    ],
+    [
+      "엉덩이 힘주기",
+      "의자에 앉아 엉덩이에 힘을 주고 3초 유지하기 8회"
+    ],
+    [
+      "가슴 펴기",
+      "양손을 뒤로 살짝 보내 가슴을 열고 10초 유지"
+    ]
+  ],
+  [
+    [
+      "허리 세우기",
+      "의자에 앉아 등을 곧게 세우고 배에 힘을 살짝 주기 5회"
+    ],
+    [
+      "앉아서 팔 올리기",
+      "양팔을 어깨 높이까지 천천히 올렸다 내리기 8회"
+    ],
+    [
+      "무릎 사이 쿠션 누르기",
+      "무릎 사이에 쿠션을 두고 가볍게 5초 누르기 6회"
+    ]
+  ],
+  [
+    [
+      "발바닥 굴리기",
+      "작은 공이나 수건을 발바닥 아래 두고 앞뒤로 굴리기"
+    ],
+    [
+      "앉아서 몸통 돌리기",
+      "의자에 앉아 상체를 좌우로 작게 돌리기 6회"
+    ],
+    [
+      "어깨 으쓱 내리기",
+      "어깨를 귀 쪽으로 올렸다가 툭 내려놓기 8회"
+    ]
+  ],
+  [
+    [
+      "천천히 3분 걷기",
+      "집 안 안전한 곳에서 편한 속도로 3분 걷기"
+    ],
+    [
+      "발 옆으로 벌리기",
+      "의자를 잡고 한 발씩 옆으로 벌렸다 모으기 8회"
+    ],
+    [
+      "턱 당기기",
+      "고개를 숙이지 않고 턱을 살짝 뒤로 당겨 목 뒤를 길게 하기"
+    ]
+  ],
+  [
+    [
+      "수건 잡아당기기",
+      "수건 양끝을 잡고 가슴 앞에서 가볍게 당기기 5초씩"
+    ],
+    [
+      "앉아서 뒤꿈치 밀기",
+      "발을 바닥에 두고 뒤꿈치를 앞으로 밀었다 당기기"
+    ],
+    [
+      "손바닥 밀기",
+      "양손바닥을 가슴 앞에서 맞대고 5초간 부드럽게 밀기"
+    ]
+  ],
+  [
+    [
+      "의자 앉았다 일어서기",
+      "팔걸이나 식탁을 가볍게 잡고 천천히 일어섰다가 앉기 5–8회"
+    ],
+    [
+      "발뒤꿈치 들기",
+      "의자 등받이를 잡고 발뒤꿈치를 천천히 들었다 내리기 10회"
+    ],
+    [
+      "목·어깨 풀기",
+      "어깨를 뒤로 천천히 돌리고 목을 좌우로 부드럽게 기울이기"
+    ]
+  ],
+  [
+    [
+      "무릎 들어 올리기",
+      "의자에 앉아 한쪽 무릎씩 천천히 들어 올리기 10회"
+    ],
+    [
+      "벽 짚고 팔굽혀펴기",
+      "벽을 짚고 몸을 천천히 가까이했다 밀기 6–10회"
+    ],
+    [
+      "발목 돌리기",
+      "앉아서 발목을 안쪽·바깥쪽으로 천천히 돌리기"
+    ]
+  ],
+  [
+    [
+      "옆으로 다리 들기",
+      "의자를 잡고 한쪽 다리를 옆으로 살짝 들기 8회"
+    ],
+    [
+      "제자리 걷기",
+      "무릎을 낮게 들고 제자리에서 1분 걷기"
+    ],
+    [
+      "손가락 쥐었다 펴기",
+      "손을 꽉 쥐었다 천천히 펴기 10회"
+    ]
+  ],
+  [
+    [
+      "뒤꿈치-발끝 걷기",
+      "벽 옆에서 천천히 일자로 5–8걸음 걷기"
+    ],
+    [
+      "종아리 스트레칭",
+      "벽을 짚고 한쪽 다리를 뒤로 빼 10초 유지"
+    ],
+    [
+      "깊은 호흡",
+      "코로 천천히 들이마시고 입으로 길게 내쉬기 5회"
+    ]
+  ],
+  [
+    [
+      "앉아서 다리 펴기",
+      "의자에 앉아 한쪽 다리를 펴고 2초 유지 후 내리기"
+    ],
+    [
+      "옆구리 늘리기",
+      "양손을 올리고 몸을 좌우로 천천히 기울이기"
+    ],
+    [
+      "손목 돌리기",
+      "손목을 천천히 돌려 굳은 느낌을 풀어주기"
+    ]
+  ],
+  [
+    [
+      "의자에 앉아 발끝 들기",
+      "발뒤꿈치는 바닥에 두고 발끝만 들어 올리기 10회"
+    ],
+    [
+      "엉덩이 힘주기",
+      "의자에 앉아 엉덩이에 힘을 주고 3초 유지하기 8회"
+    ],
+    [
+      "가슴 펴기",
+      "양손을 뒤로 살짝 보내 가슴을 열고 10초 유지"
+    ]
+  ],
+  [
+    [
+      "허리 세우기",
+      "의자에 앉아 등을 곧게 세우고 배에 힘을 살짝 주기 5회"
+    ],
+    [
+      "앉아서 팔 올리기",
+      "양팔을 어깨 높이까지 천천히 올렸다 내리기 8회"
+    ],
+    [
+      "무릎 사이 쿠션 누르기",
+      "무릎 사이에 쿠션을 두고 가볍게 5초 누르기 6회"
+    ]
+  ],
+  [
+    [
+      "발바닥 굴리기",
+      "작은 공이나 수건을 발바닥 아래 두고 앞뒤로 굴리기"
+    ],
+    [
+      "앉아서 몸통 돌리기",
+      "의자에 앉아 상체를 좌우로 작게 돌리기 6회"
+    ],
+    [
+      "어깨 으쓱 내리기",
+      "어깨를 귀 쪽으로 올렸다가 툭 내려놓기 8회"
+    ]
+  ],
+  [
+    [
+      "천천히 3분 걷기",
+      "집 안 안전한 곳에서 편한 속도로 3분 걷기"
+    ],
+    [
+      "발 옆으로 벌리기",
+      "의자를 잡고 한 발씩 옆으로 벌렸다 모으기 8회"
+    ],
+    [
+      "턱 당기기",
+      "고개를 숙이지 않고 턱을 살짝 뒤로 당겨 목 뒤를 길게 하기"
+    ]
+  ],
+  [
+    [
+      "수건 잡아당기기",
+      "수건 양끝을 잡고 가슴 앞에서 가볍게 당기기 5초씩"
+    ],
+    [
+      "앉아서 뒤꿈치 밀기",
+      "발을 바닥에 두고 뒤꿈치를 앞으로 밀었다 당기기"
+    ],
+    [
+      "손바닥 밀기",
+      "양손바닥을 가슴 앞에서 맞대고 5초간 부드럽게 밀기"
+    ]
+  ],
+  [
+    [
+      "의자 앉았다 일어서기",
+      "팔걸이나 식탁을 가볍게 잡고 천천히 일어섰다가 앉기 5–8회"
+    ],
+    [
+      "발뒤꿈치 들기",
+      "의자 등받이를 잡고 발뒤꿈치를 천천히 들었다 내리기 10회"
+    ],
+    [
+      "목·어깨 풀기",
+      "어깨를 뒤로 천천히 돌리고 목을 좌우로 부드럽게 기울이기"
+    ]
+  ],
+  [
+    [
+      "무릎 들어 올리기",
+      "의자에 앉아 한쪽 무릎씩 천천히 들어 올리기 10회"
+    ],
+    [
+      "벽 짚고 팔굽혀펴기",
+      "벽을 짚고 몸을 천천히 가까이했다 밀기 6–10회"
+    ],
+    [
+      "발목 돌리기",
+      "앉아서 발목을 안쪽·바깥쪽으로 천천히 돌리기"
+    ]
+  ],
+  [
+    [
+      "옆으로 다리 들기",
+      "의자를 잡고 한쪽 다리를 옆으로 살짝 들기 8회"
+    ],
+    [
+      "제자리 걷기",
+      "무릎을 낮게 들고 제자리에서 1분 걷기"
+    ],
+    [
+      "손가락 쥐었다 펴기",
+      "손을 꽉 쥐었다 천천히 펴기 10회"
+    ]
+  ],
+  [
+    [
+      "뒤꿈치-발끝 걷기",
+      "벽 옆에서 천천히 일자로 5–8걸음 걷기"
+    ],
+    [
+      "종아리 스트레칭",
+      "벽을 짚고 한쪽 다리를 뒤로 빼 10초 유지"
+    ],
+    [
+      "깊은 호흡",
+      "코로 천천히 들이마시고 입으로 길게 내쉬기 5회"
+    ]
+  ],
+  [
+    [
+      "앉아서 다리 펴기",
+      "의자에 앉아 한쪽 다리를 펴고 2초 유지 후 내리기"
+    ],
+    [
+      "옆구리 늘리기",
+      "양손을 올리고 몸을 좌우로 천천히 기울이기"
+    ],
+    [
+      "손목 돌리기",
+      "손목을 천천히 돌려 굳은 느낌을 풀어주기"
+    ]
+  ]
+];
+
+function seedFromDate(dateStr) {
+  let n = 0;
+  for (const ch of dateStr) n = (n * 31 + ch.charCodeAt(0)) >>> 0;
+  return n;
+}
+function pick(arr, seed, offset=0) {
+  return arr[(seed + offset) % arr.length];
+}
+function formatDate(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
+}
+function render() {
+  const date = document.getElementById("dateInput").value;
+  const seed = seedFromDate(date);
+  const h = pick(healthTips, seed, 0);
+  const habit = pick(lifestyleTips, seed, 7);
+  const mind = pick(mindTips, seed, 13);
+  const texas = pick(texasNotes, seed, 19);
+  const ex = pick(exerciseSets, seed, 23);
+
+  document.getElementById("prettyDate").textContent = formatDate(date);
+  document.getElementById("familyOut").textContent = document.getElementById("familyText").value.trim();
+  document.getElementById("subtitleOut").textContent = document.getElementById("subtitleInput").value.trim() || "재인이네 가족이 보내는 하루 소식";
+
+  document.getElementById("healthLead").textContent = h.lead;
+  document.getElementById("goodFoods").innerHTML = h.good.map(x => `<li>${x}</li>`).join("");
+  document.getElementById("avoidFoods").innerHTML = h.avoid.map(x => `<li>${x}</li>`).join("");
+  document.getElementById("habitOut").textContent = habit;
+
+  document.getElementById("quoteOut").textContent = `“${mind.text}”`;
+  document.getElementById("quoteBy").textContent = `— ${mind.by}`;
+  document.getElementById("quoteNote").textContent = mind.note;
+
+  document.getElementById("exerciseOut").innerHTML = ex.map((m, i) => `
+    <div class="move">
+      <div class="num">${i+1}</div>
+      <div>
+        <div class="moveTitle">${m[0]}</div>
+        <div class="moveDesc">${m[1]}</div>
+      </div>
+    </div>
+  `).join("");
+
+  document.getElementById("sourceOut").textContent =
+    `${h.source}; CDC Older Adult Physical Activity Guidelines. 개인 건강 상태에 따라 의사 상담이 필요할 수 있습니다.`;
+}
+
+function handlePhotos(files) {
+  const grid = document.getElementById("photoGrid");
+  grid.innerHTML = "";
+  const selected = Array.from(files).slice(0, 4);
+  grid.className = selected.length <= 1 ? "photoGrid one" : "photoGrid";
+  if (selected.length === 0) {
+    grid.innerHTML = `<div style="height:220px;border-radius:22px;background:#f5eadb;display:grid;place-items:center;font-size:30px;color:#8d765f;">사진을 올리면 여기에 표시됩니다</div>`;
+    return;
+  }
+  selected.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.createElement("img");
+      img.src = e.target.result;
+      grid.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function setSaveStatus(message) {
+  const el = document.getElementById("saveStatus");
+  if (el) el.textContent = message || "";
+}
+
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+}
+
+function dataUrlToBlob(dataUrl) {
+  const parts = dataUrl.split(",");
+  const mimeMatch = parts[0].match(/:(.*?);/);
+  const mime = mimeMatch ? mimeMatch[1] : "image/png";
+  const binary = atob(parts[1]);
+  const len = binary.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+}
+
+async function makeNewsletterDataUrl() {
+  if (!window.htmlToImage) {
+    throw new Error("이미지 저장 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 다시 열어주세요.");
+  }
+  if (document.fonts && document.fonts.ready) {
+    await document.fonts.ready;
+  }
+  const node = document.getElementById("newsletter");
+  return await htmlToImage.toPng(node, {
+    pixelRatio: isMobileDevice() ? 1 : Math.min(2, window.devicePixelRatio || 1),
+    cacheBust: true,
+    backgroundColor: "#f8eedf",
+    style: { transform: "none" }
+  });
+}
+
+function openImageInNewTab(dataUrl) {
+  const win = window.open();
+  if (win) {
+    win.document.write(`<!doctype html><html><head><title>텍사스, 오늘</title>
+  <meta name="theme-color" content="#8d6748" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon-192.png" /><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;background:#f4f1ec;text-align:center;"><p style="font-family:sans-serif;padding:12px;">이미지를 길게 눌러 사진 앱에 저장하세요.</p><img src="${dataUrl}" style="max-width:100%;height:auto;" /><script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
+</script>
+</body></html>`);
+    win.document.close();
+    return true;
+  }
+  return false;
+}
+
+
+function setStatus(message) {
+  const status = document.getElementById("statusOut");
+  if (status) status.textContent = message || "";
+}
+
+function dataUrlToFile(dataUrl, filename) {
+  const parts = dataUrl.split(",");
+  const mimeMatch = parts[0].match(/:(.*?);/);
+  const mime = mimeMatch ? mimeMatch[1] : "image/png";
+  const binary = atob(parts[1]);
+  const len = binary.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+  return new File([bytes], filename, { type: mime });
+}
+
+async function makeNewsletterDataUrl() {
+  const node = document.getElementById("newsletter");
+  return await htmlToImage.toPng(node, {
+    pixelRatio: Math.min(2, window.devicePixelRatio || 1),
+    cacheBust: true,
+    backgroundColor: "#f8eedf",
+    style: { transform: "none" }
+  });
+}
+
+function showFallbackImage(dataUrl) {
+  const box = document.getElementById("sharePreview");
+  if (!box) return;
+  box.style.display = "block";
+  box.innerHTML = `
+    <p class="hint" style="margin:0 0 10px !important;">
+      이 브라우저에서는 바로 공유 메뉴가 열리지 않았습니다. 아래 이미지를 길게 눌러 공유하거나 저장하세요.
+    </p>
+    <img src="${dataUrl}" alt="뉴스레터 결과 이미지" />
+  `;
+}
+
+async function shareNewsletter() {
+  try {
+    setStatus("이미지를 만드는 중입니다. 잠시만 기다려주세요.");
+    const date = document.getElementById("dateInput").value;
+    const dataUrl = await makeNewsletterDataUrl();
+    const file = dataUrlToFile(dataUrl, `텍사스_오늘_${date}.png`);
+
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      setStatus("공유 메뉴를 여는 중입니다.");
+      await navigator.share({
+        files: [file],
+        title: "텍사스, 오늘",
+        text: "오늘의 뉴스레터 이미지입니다."
+      });
+      setStatus("공유 메뉴를 열었습니다.");
+      return;
+    }
+
+    // Some Android browsers support navigator.share but not canShare(files).
+    if (navigator.share) {
+      try {
+        setStatus("이 브라우저가 이미지 파일 공유를 제한하여, 텍스트 공유를 시도합니다.");
+        await navigator.share({
+          title: "텍사스, 오늘",
+          text: "뉴스레터 이미지를 아래 미리보기에서 길게 눌러 공유해주세요."
+        });
+      } catch (e) {}
+    }
+
+    showFallbackImage(dataUrl);
+    setStatus("이미지 직접 공유가 지원되지 않아 미리보기를 만들었습니다.");
+  } catch (err) {
+    console.error(err);
+    setStatus("이미지 생성 또는 공유 중 오류가 났습니다. 사진 수를 줄이거나 Chrome/Safari에서 다시 시도해보세요.");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const today = new Date();
+  const local = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0,10);
+  document.getElementById("dateInput").value = local;
+  handlePhotos([]);
+  render();
+
+  document.getElementById("dateInput").addEventListener("change", render);
+  document.getElementById("familyText").addEventListener("input", render);
+  document.getElementById("subtitleInput").addEventListener("input", render);
+  document.getElementById("regenBtn").addEventListener("click", render);
+  document.getElementById("photoInput").addEventListener("change", e => handlePhotos(e.target.files));
+  document.getElementById("shareBtn").addEventListener("click", shareNewsletter);
+});
+
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
