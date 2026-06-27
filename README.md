@@ -11,4 +11,7 @@ GitHub Pages에 업로드할 파일:
 - icon-512.png
 
 업로드 후 접속:
-https://jannyland7005.github.io/texas-today/?v=canvas2
+https://jannyland7005.github.io/texas-today/?v=canvas4
+
+
+v4: 고정 비율 제거, 사진 crop 방지, 사진 개수별 카드 높이 자동 조정, 하단 잘림 방지, 큰 글씨 유지.
