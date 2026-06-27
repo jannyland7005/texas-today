@@ -1,5 +1,9 @@
 const W = 1080;
-const OUTPUT_TOP_PADDING = 110;
+
+// Padding added only to the final shared/generated PNG.
+// This prevents iPhone status-bar/time overlay from covering the title.
+const SAFE_TOP = 160;
+
 let uploadedImages = [];
 let rerollOffset = 0;
 let latestBlob = null;
@@ -145,6 +149,8 @@ function sectionHead(ctx, emoji, title, x, yBase) {
   ctx.fillText(title, x + 98, yBase);
 }
 
+// Returns a box with the exact photo aspect ratio.
+// No cover, no crop.
 function imageBoxForFullPhoto(img, maxWidth) {
   const iw = img.naturalWidth || img.width || maxWidth;
   const ih = img.naturalHeight || img.height || maxWidth;
@@ -292,6 +298,9 @@ function renderNewsletter() {
   const mind = pick(mindTips, seed, 13);
   const ex = pick(exerciseSets, seed, 23);
 
+  // Draw all newsletter content into an offscreen canvas starting at y=0.
+  // Then copy it into the visible/final canvas at y=SAFE_TOP.
+  // This creates real blank space inside the final PNG above the title.
   const off = document.createElement("canvas");
   off.width = W;
   off.height = 12000;
@@ -304,7 +313,7 @@ function renderNewsletter() {
   const innerW = cardW - 72;
   const gap = 30;
 
-  let y = 88 + OUTPUT_TOP_PADDING;
+  let y = 88;
 
   // Header
   ctx.font = font(900, TYPE.title);
@@ -318,11 +327,11 @@ function renderNewsletter() {
   const dateText = formatDate(date);
   ctx.font = font(800, TYPE.date);
   const dw = ctx.measureText(dateText).width + 74;
-  fillRound(ctx, W - 58 - dw, 38 + OUTPUT_TOP_PADDING, dw, 90, 45, "#fffdf8", COLORS.line, 2);
+  fillRound(ctx, W - 58 - dw, 38, dw, 90, 45, "#fffdf8", COLORS.line, 2);
   ctx.fillStyle = COLORS.ink;
-  ctx.fillText(dateText, W - 58 - dw + 37, 96 + OUTPUT_TOP_PADDING);
+  ctx.fillText(dateText, W - 58 - dw + 37, 96);
 
-  y = (subtitle ? 184 : 154) + OUTPUT_TOP_PADDING;
+  y = subtitle ? 184 : 154;
 
   // Family
   const pLayout = photoLayout(uploadedImages, innerW);
@@ -408,11 +417,15 @@ function renderNewsletter() {
   ctx.fillText("from 미국 가족", 790, y + 56);
   y += 190;
 
-  const finalH = Math.ceil(y + 40);
+  const contentH = Math.ceil(y + 40);
+  const finalH = contentH + SAFE_TOP;
+
   canvas.width = W;
   canvas.height = finalH;
   drawBackground(visible, finalH);
-  visible.drawImage(off, 0, 0, W, finalH, 0, 0, W, finalH);
+
+  // Real top blank space for the final shared image:
+  visible.drawImage(off, 0, 0, W, contentH, 0, SAFE_TOP, W, contentH);
 
   latestBlob = null;
 }
