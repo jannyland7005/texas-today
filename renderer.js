@@ -303,7 +303,7 @@ function renderNewsletter() {
   const innerW = cardW - 72;
   const gap = 30;
 
-  let y = 140;
+  let y = 88;
 
   // Header
   ctx.font = font(900, TYPE.title);
@@ -317,9 +317,9 @@ function renderNewsletter() {
   const dateText = formatDate(date);
   ctx.font = font(800, TYPE.date);
   const dw = ctx.measureText(dateText).width + 74;
-  fillRound(ctx, W - 58 - dw, 70, dw, 90, 45, "#fffdf8", COLORS.line, 2);
+  fillRound(ctx, W - 58 - dw, 38, dw, 90, 45, "#fffdf8", COLORS.line, 2);
   ctx.fillStyle = COLORS.ink;
-  ctx.fillText(dateText, W - 58 - dw + 37, 128);
+  ctx.fillText(dateText, W - 58 - dw + 37, 96);
 
   y = subtitle ? 184 : 154;
 
