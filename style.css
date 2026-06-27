@@ -1,0 +1,137 @@
+ :root {
+  --bg: #f4f1ec;
+  --paper: #fffdf8;
+  --ink: #2c2925;
+  --muted: #6b6258;
+  --line: #e9dccb;
+  --accent: #8d6748;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.app {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.panel {
+  background: white;
+  border: 1px solid #e5dfd7;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+  position: sticky;
+  top: 14px;
+}
+
+h1 {
+  font-size: 24px;
+  margin: 0 0 6px;
+  letter-spacing: -0.04em;
+}
+
+p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 14px;
+}
+
+label {
+  display: block;
+  margin: 14px 0 6px;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+input, textarea {
+  width: 100%;
+  border: 1px solid #d9d1c7;
+  border-radius: 12px;
+  padding: 12px;
+  font-family: inherit;
+  font-size: 16px;
+  background: #fffdfb;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+button {
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-family: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  margin-top: 12px;
+  font-size: 16px;
+}
+
+.primary { background: var(--accent); color: white; }
+.secondary { background: #eee5da; color: #3f352d; }
+
+.hint {
+  font-size: 12px;
+  color: #85776b;
+  margin-top: 10px;
+}
+
+.status {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: #fff7ec;
+  border: 1px solid #eadcc9;
+  border-radius: 12px;
+  color: #6b6258;
+  font-size: 13px;
+  line-height: 1.45;
+  min-height: 40px;
+}
+
+.preview {
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 20px;
+}
+
+canvas {
+  width: min(100%, 680px);
+  height: auto;
+  background: #f8eedf;
+  border-radius: 8px;
+  box-shadow: 0 16px 46px rgba(0,0,0,.16);
+}
+
+@media (max-width: 900px) {
+  .app {
+    display: block;
+    padding: 10px;
+  }
+  .panel {
+    position: static;
+    margin-bottom: 14px;
+  }
+  .preview {
+    display: block;
+  }
+  canvas {
+    width: 100%;
+  }
+}
