@@ -11,4 +11,4 @@ GitHub Pages에 업로드할 파일:
 - icon-512.png
 
 업로드 후 접속:
-https://jannyland7005.github.io/texas-today/?v=canvas1
+https://jannyland7005.github.io/texas-today/?v=canvas2

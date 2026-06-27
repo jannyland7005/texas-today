@@ -108,7 +108,7 @@
       padding-bottom: 20px;
     }
     canvas {
-      width: min(100%, 540px);
+      width: min(100%, 620px);
       height: auto;
       background: #f8eedf;
       border-radius: 8px;
@@ -161,10 +161,9 @@
 
       <button class="secondary" id="rerollBtn">오늘의 건강/생활 팁 다시 조합</button>
       <button class="primary" id="shareBtn">카카오톡/문자/이메일로 공유</button>
-      <button class="secondary" id="saveBtn">이미지 파일로 열기</button>
 
       <div id="status" class="status">내용을 입력하거나 사진을 올리면 자동으로 미리보기가 갱신됩니다.</div>
-      <p class="hint">공유 버튼이 기기에서 막히면 “이미지 파일로 열기”를 누른 뒤 이미지를 길게 눌러 공유하세요.</p>
+      <p class="hint">공유 버튼을 누르면 카카오톡, 문자, 이메일 등으로 뉴스레터 이미지를 보낼 수 있습니다.</p>
     </aside>
 
     <main class="preview">
@@ -314,7 +313,7 @@ function drawIcon(ctx, emoji, x, y) {
 }
 function drawSectionHead(ctx, emoji, title, x, y) {
   drawIcon(ctx, emoji, x, y-38);
-  ctx.font = canvasFont(800, 33);
+  ctx.font = canvasFont(800, 39);
   ctx.fillStyle = "#2c2925";
   ctx.fillText(title, x+70, y);
 }
@@ -336,35 +335,38 @@ function drawImageCover(ctx, img, x, y, w, h, r) {
   ctx.lineWidth = 2;
   ctx.stroke();
 }
+function miniBoxHeight(items) {
+  return 76 + items.length * 46 + 30;
+}
 function drawMiniBox(ctx, title, items, x, y, w) {
-  const h = 64 + items.length * 40 + 24;
+  const h = miniBoxHeight(items);
   fillRounded(ctx, x, y, w, h, 22, "#fbf5ec", "#eadcc9", 1);
-  ctx.font = canvasFont(800, 25);
+  ctx.font = canvasFont(800, 30);
   ctx.fillStyle = "#2c2925";
   ctx.fillText(title, x+24, y+42);
-  ctx.font = canvasFont(500, 24);
-  let yy = y+84;
+  ctx.font = canvasFont(500, 29);
+  let yy = y+90;
   for (const item of items) {
     ctx.fillText("•", x+28, yy);
     ctx.fillText(item, x+58, yy);
-    yy += 40;
+    yy += 46;
   }
   return y + h;
 }
 function drawMove(ctx, num, title, desc, x, y, w) {
-  const h = 116;
+  const h = 138;
   fillRounded(ctx, x, y, w, h, 22, "#f8f2e9", "#e7d8c6", 1);
-  fillRounded(ctx, x+18, y+22, 54, 54, 18, "#ffffff", "#e6d5c2", 2);
-  ctx.font = canvasFont(800, 26);
+  fillRounded(ctx, x+18, y+26, 58, 58, 18, "#ffffff", "#e6d5c2", 2);
+  ctx.font = canvasFont(800, 31);
   ctx.fillStyle = "#8d6748";
   ctx.textAlign = "center";
-  ctx.fillText(String(num), x+45, y+58);
+  ctx.fillText(String(num), x+47, y+66);
   ctx.textAlign = "left";
-  ctx.font = canvasFont(800, 26);
+  ctx.font = canvasFont(800, 31);
   ctx.fillStyle = "#2c2925";
-  ctx.fillText(title, x+94, y+42);
-  ctx.font = canvasFont(500, 23);
-  drawWrapped(ctx, desc, x+94, y+78, w-116, 34, "#5e554c");
+  ctx.fillText(title, x+100, y+48);
+  ctx.font = canvasFont(500, 27);
+  drawWrapped(ctx, desc, x+100, y+90, w-124, 38, "#5e554c");
   return y + h;
 }
 async function loadImageFromFile(file) {
@@ -419,19 +421,19 @@ function renderNewsletter() {
   ctx.fillRect(0,0,W,2600);
 
   y = 76;
-  ctx.font = canvasFont(900, 54);
+  ctx.font = canvasFont(900, 64);
   ctx.fillStyle = "#2c2925";
   ctx.fillText("텍사스, 오늘", 58, y);
-  ctx.font = canvasFont(500, 25);
+  ctx.font = canvasFont(500, 31);
   ctx.fillStyle = "#6b6258";
   if (subtitle) ctx.fillText(subtitle, 58, y+46);
 
   const dateText = formatDate(date);
-  ctx.font = canvasFont(800, 24);
-  const dw = ctx.measureText(dateText).width + 48;
-  fillRounded(ctx, W-58-dw, 38, dw, 62, 31, "#fffdf8", "#e9dccb", 2);
+  ctx.font = canvasFont(800, 28);
+  const dw = ctx.measureText(dateText).width + 56;
+  fillRounded(ctx, W-58-dw, 36, dw, 68, 34, "#fffdf8", "#e9dccb", 2);
   ctx.fillStyle = "#2c2925";
-  ctx.fillText(dateText, W-58-dw+24, 78);
+  ctx.fillText(dateText, W-58-dw+28, 82);
 
   y = 150;
   // Family card
@@ -449,9 +451,9 @@ function renderNewsletter() {
   } else {
     photoHeight = 614;
   }
-  ctx.font = canvasFont(500, 27);
+  ctx.font = canvasFont(500, 32);
   const familyLines = wrapText(ctx, familyText, cardW-60);
-  const familyH = familyText ? familyLines.length * 46 + 30 : 20;
+  const familyH = familyText ? familyLines.length * 54 + 30 : 20;
   const familyCardH = 86 + photoHeight + familyH + 26;
   fillRounded(ctx, cardX, cardY, cardW, familyCardH, 28, "rgba(255,253,248,.96)", "#e9dccb", 2);
   drawSectionHead(ctx, "🏡", "오늘의 우리 소식", cardX+30, cardY+62);
@@ -479,19 +481,21 @@ function renderNewsletter() {
     });
     textStartY = py + 2*ih + gap + 38;
   }
-  ctx.font = canvasFont(500, 27);
-  drawWrapped(ctx, familyText, px, textStartY, cardW-60, 46);
+  ctx.font = canvasFont(500, 32);
+  drawWrapped(ctx, familyText, px, textStartY, cardW-60, 54);
   y = cardY + familyCardH + 24;
 
   // Health
   cardY = y;
-  ctx.font = canvasFont(500, 27);
+  ctx.font = canvasFont(500, 32);
   const healthLeadLines = wrapText(ctx, health.lead, cardW-60);
-  const healthCardH = 100 + healthLeadLines.length*46 + 18 + 220 + 18 + 220 + 34;
+  const goodBoxH = miniBoxHeight(health.good);
+  const avoidBoxH = miniBoxHeight(health.avoid);
+  const healthCardH = 110 + healthLeadLines.length*54 + 24 + goodBoxH + 18 + avoidBoxH + 42;
   fillRounded(ctx, cardX, cardY, cardW, healthCardH, 28, "rgba(255,253,248,.96)", "#e9dccb", 2);
   drawSectionHead(ctx, "🥣", "오늘의 건강 상식", cardX+30, cardY+62);
-  ctx.font = canvasFont(500, 27);
-  let hy = drawWrapped(ctx, health.lead, cardX+30, cardY+116, cardW-60, 46);
+  ctx.font = canvasFont(500, 32);
+  let hy = drawWrapped(ctx, health.lead, cardX+30, cardY+120, cardW-60, 54);
   hy += 18;
   hy = drawMiniBox(ctx, "오늘 먹으면 좋은 메뉴", health.good, cardX+30, hy, cardW-60) + 18;
   drawMiniBox(ctx, "오늘 조심할 메뉴", health.avoid, cardX+30, hy, cardW-60);
@@ -499,55 +503,55 @@ function renderNewsletter() {
 
   // Habit
   cardY = y;
-  ctx.font = canvasFont(500, 27);
+  ctx.font = canvasFont(500, 32);
   const habitLines = wrapText(ctx, habit, cardW-60);
-  const habitCardH = 100 + habitLines.length*46 + 26;
+  const habitCardH = 100 + habitLines.length*54 + 26;
   fillRounded(ctx, cardX, cardY, cardW, habitCardH, 28, "rgba(255,253,248,.96)", "#e9dccb", 2);
   drawSectionHead(ctx, "🌿", "오늘의 생활 습관", cardX+30, cardY+62);
-  ctx.font = canvasFont(500, 27);
-  drawWrapped(ctx, habit, cardX+30, cardY+120, cardW-60, 46);
+  ctx.font = canvasFont(500, 32);
+  drawWrapped(ctx, habit, cardX+30, cardY+124, cardW-60, 54);
   y = cardY + habitCardH + 24;
 
   // Mind
   cardY = y;
-  ctx.font = canvasFont(700, 29);
+  ctx.font = canvasFont(700, 34);
   const quote = `“${mind.text}”`;
   const quoteLines = wrapText(ctx, quote, cardW-60);
-  ctx.font = canvasFont(500, 22);
+  ctx.font = canvasFont(500, 26);
   const noteLines = wrapText(ctx, mind.note, cardW-60);
-  const mindCardH = 100 + quoteLines.length*48 + 42 + noteLines.length*34 + 30;
+  const mindCardH = 100 + quoteLines.length*58 + 42 + noteLines.length*38 + 30;
   fillRounded(ctx, cardX, cardY, cardW, mindCardH, 28, "rgba(255,253,248,.96)", "#e9dccb", 2);
   drawSectionHead(ctx, "🕯️", "마음 습관", cardX+30, cardY+62);
-  ctx.font = canvasFont(700, 29);
-  let my = drawWrapped(ctx, quote, cardX+30, cardY+125, cardW-60, 48);
-  ctx.font = canvasFont(500, 23);
+  ctx.font = canvasFont(700, 34);
+  let my = drawWrapped(ctx, quote, cardX+30, cardY+130, cardW-60, 58);
+  ctx.font = canvasFont(500, 27);
   ctx.fillStyle = "#6b6258";
   ctx.fillText(`— ${mind.by}`, cardX+30, my+8);
-  ctx.font = canvasFont(500, 22);
-  drawWrapped(ctx, mind.note, cardX+30, my+48, cardW-60, 34, "#6b6258");
+  ctx.font = canvasFont(500, 26);
+  drawWrapped(ctx, mind.note, cardX+30, my+54, cardW-60, 38, "#6b6258");
   y = cardY + mindCardH + 24;
 
   // Exercise
   cardY = y;
-  const exCardH = 100 + 3*116 + 2*14 + 72;
+  const exCardH = 110 + 3*138 + 2*16 + 90;
   fillRounded(ctx, cardX, cardY, cardW, exCardH, 28, "rgba(255,253,248,.96)", "#e9dccb", 2);
   drawSectionHead(ctx, "🪑", "하루 운동", cardX+30, cardY+62);
   let ey = cardY + 100;
   ex.forEach((m, i) => {
-    ey = drawMove(ctx, i+1, m[0], m[1], cardX+30, ey, cardW-60) + 14;
+    ey = drawMove(ctx, i+1, m[0], m[1], cardX+30, ey, cardW-60) + 16;
   });
-  ctx.font = canvasFont(500, 22);
-  drawWrapped(ctx, "통증, 어지럼, 숨참이 있으면 즉시 멈추고, 지팡이·의자 등 안전한 지지대를 사용하세요.", cardX+30, ey+20, cardW-60, 34, "#6b6258");
+  ctx.font = canvasFont(500, 26);
+  drawWrapped(ctx, "통증, 어지럼, 숨참이 있으면 즉시 멈추고, 지팡이·의자 등 안전한 지지대를 사용하세요.", cardX+30, ey+24, cardW-60, 38, "#6b6258");
   y = cardY + exCardH + 40;
 
   // Footer
-  ctx.font = canvasFont(500, 18);
-  drawWrapped(ctx, `참고: ${health.source}; CDC Older Adult Physical Activity Guidelines. 개인 건강 상태에 따라 의사 상담이 필요할 수 있습니다.`, 66, y, 760, 28, "#75695f");
-  ctx.font = canvasFont(900, 18);
+  ctx.font = canvasFont(500, 22);
+  drawWrapped(ctx, `참고: ${health.source}; CDC Older Adult Physical Activity Guidelines. 개인 건강 상태에 따라 의사 상담이 필요할 수 있습니다.`, 66, y, 760, 34, "#75695f");
+  ctx.font = canvasFont(900, 22);
   ctx.fillStyle = "#9a816b";
   ctx.fillText("from 미국 가족", 860, y+26);
 
-  const finalH = Math.ceil(y + 90);
+  const finalH = Math.ceil(y + 150);
   const imgData = ctx.getImageData(0, 0, W, finalH);
   canvas.height = finalH;
   const ctx2 = canvas.getContext("2d");
@@ -578,33 +582,16 @@ async function shareNewsletter() {
     }
     if (navigator.share) {
       await navigator.share({ title: "텍사스, 오늘" });
-      setStatus("이 기기에서는 이미지 파일 직접 공유가 제한됩니다. ‘이미지 파일로 열기’를 눌러 길게 눌러 공유하세요.");
+      setStatus("이 기기에서는 이미지 파일 직접 공유가 제한됩니다. 브라우저/카카오톡 공유 제한일 수 있습니다.");
       return;
     }
-    setStatus("이 브라우저에서는 직접 공유가 제한됩니다. ‘이미지 파일로 열기’를 사용하세요.");
+    setStatus("이 브라우저에서는 직접 공유가 제한됩니다. 다른 브라우저에서 다시 시도해보세요.");
   } catch (err) {
     console.error(err);
     setStatus("공유가 취소되었거나 제한되었습니다. ‘이미지 파일로 열기’를 눌러 이미지를 길게 눌러 공유하세요.");
   }
 }
-async function openImageFile() {
-  try {
-    renderNewsletter();
-    const blob = await getBlob();
-    const url = URL.createObjectURL(blob);
-    const win = window.open(url, "_blank");
-    if (!win) {
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "텍사스_오늘.png";
-      a.click();
-    }
-    setStatus("이미지가 열렸습니다. 휴대폰에서는 이미지를 길게 눌러 저장하거나 공유하세요.");
-  } catch (err) {
-    console.error(err);
-    setStatus("이미지 열기에 실패했습니다.");
-  }
-}
+
 function initDate() {
   const today = new Date();
   const local = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0,10);
@@ -620,7 +607,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("photoInput").addEventListener("change", e => handlePhotos(e.target.files));
   document.getElementById("rerollBtn").addEventListener("click", () => { rerollOffset += 1; renderNewsletter(); });
   document.getElementById("shareBtn").addEventListener("click", shareNewsletter);
-  document.getElementById("saveBtn").addEventListener("click", openImageFile);
 });
 </script>
 </body>
