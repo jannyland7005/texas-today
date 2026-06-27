@@ -331,12 +331,46 @@
       font-weight: 800;
       color: #9a816b;
     }
+    .captureFullSize {
+      width: 1080px !important;
+      min-width: 1080px !important;
+      transform: none !important;
+      margin: 0 !important;
+    }
     @media (max-width: 900px) {
       .app {
-        display: block;
-        max-width: 100%;
-        padding: 10px;
+        grid-template-columns: 1fr;
+        padding: 12px;
+        gap: 16px;
       }
+      .panel {
+        position: static;
+      }
+      .row {
+        grid-template-columns: 1fr;
+      }
+      button {
+        font-size: 16px;
+      }
+      input, textarea {
+        font-size: 16px;
+      }
+      .previewWrap {
+        overflow-x: auto;
+        display: flex;
+        justify-content: flex-start;
+        padding-bottom: 24px;
+        min-height: 720px;
+      }
+      #newsletter {
+        width: 1080px;
+        min-width: 1080px;
+        transform: scale(0.34);
+        transform-origin: top left;
+        margin-right: -710px;
+        margin-bottom: -1240px;
+      }
+    }
       .panel {
         position: static;
         margin-bottom: 14px;
@@ -496,7 +530,7 @@
     <aside class="panel">
       <h1>텍사스, 오늘 생성기</h1>
       <p>날짜, 사진, 설명을 넣고 가족 뉴스레터 이미지를 공유하세요.</p>
-      <div class="installNote">휴대폰에서 이 주소를 연 뒤 “홈 화면에 추가”를 하면 앱처럼 사용할 수 있습니다.<br><span id="appVersion">사진 업로드 수정판 v6</span></div>
+      <div class="installNote">휴대폰에서 이 주소를 연 뒤 “홈 화면에 추가”를 하면 앱처럼 사용할 수 있습니다.<br><span id="appVersion">원래 규격 복구판 v7</span></div>
 
       <label>날짜</label>
       <input id="dateInput" type="date" />
@@ -516,7 +550,7 @@
       <div class="row">
         <button type="button" class="secondary" id="regenBtn">날짜 seed로 다시 생성</button>
       </div>
-      <button type="button" class="secondary" id="shareBtn">휴대폰에서 사진으로 공유/저장</button>
+      <button class="primary" id="shareBtn">결과물 다른 앱으로 공유하기</button>
 
       <p class="hint">
         “결과물 다른 앱으로 공유하기”를 누르면 카카오톡, 문자, 이메일 등으로 이미지를 공유할 수 있습니다.
@@ -1582,14 +1616,21 @@ function render() {
     `${h.source}; CDC Older Adult Physical Activity Guidelines. 개인 건강 상태에 따라 의사 상담이 필요할 수 있습니다.`;
 }
 
-let currentPhotoObjectUrls = [];
+let currentPhotoDataUrls = [];
 
-function handlePhotos(files) {
+function readFileAsDataUrl(file) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = () => resolve(null);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handlePhotos(files) {
   const grid = document.getElementById("photoGrid");
   grid.innerHTML = "";
-
-  currentPhotoObjectUrls.forEach(url => URL.revokeObjectURL(url));
-  currentPhotoObjectUrls = [];
+  currentPhotoDataUrls = [];
 
   const selected = Array.from(files || []).slice(0, 4);
   grid.className = selected.length <= 1 ? "photoGrid one" : "photoGrid";
@@ -1599,17 +1640,20 @@ function handlePhotos(files) {
     return;
   }
 
-  selected.forEach(file => {
-    const url = URL.createObjectURL(file);
-    currentPhotoObjectUrls.push(url);
+  const dataUrls = await Promise.all(selected.map(readFileAsDataUrl));
+  currentPhotoDataUrls = dataUrls.filter(Boolean);
 
+  grid.innerHTML = "";
+  currentPhotoDataUrls.forEach(dataUrl => {
     const img = document.createElement("img");
-    img.src = url;
+    img.src = dataUrl;
     img.alt = "업로드한 가족 사진";
     img.decoding = "sync";
     img.loading = "eager";
     grid.appendChild(img);
   });
+
+  await waitForImages(grid);
 }
 
 function waitForImages(container) {
@@ -1620,29 +1664,36 @@ function waitForImages(container) {
       const done = () => resolve();
       img.addEventListener("load", done, { once: true });
       img.addEventListener("error", done, { once: true });
-      setTimeout(done, 3000);
+      setTimeout(done, 4000);
     });
   }));
 }
 
 async function makeNewsletterDataUrl() {
   const node = document.getElementById("newsletter");
+
+  node.classList.add("captureFullSize");
   await waitForImages(node);
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-  const rect = node.getBoundingClientRect();
-  return await htmlToImage.toPng(node, {
-    pixelRatio: Math.min(2, window.devicePixelRatio || 1),
-    cacheBust: true,
-    backgroundColor: "#f8eedf",
-    skipFonts: true,
-    width: Math.ceil(rect.width),
-    height: Math.ceil(node.scrollHeight),
-    style: {
-      transform: "none",
-      margin: "0"
-    }
-  });
+  try {
+    return await htmlToImage.toPng(node, {
+      pixelRatio: 1,
+      cacheBust: true,
+      backgroundColor: "#f8eedf",
+      skipFonts: true,
+      width: 1080,
+      height: Math.ceil(node.scrollHeight),
+      style: {
+        transform: "none",
+        margin: "0",
+        width: "1080px",
+        minWidth: "1080px"
+      }
+    });
+  } finally {
+    node.classList.remove("captureFullSize");
+  }
 }
 
 function openImageInNewTab(dataUrl) {
@@ -1651,7 +1702,15 @@ function openImageInNewTab(dataUrl) {
     win.document.write(`<!doctype html><html><head><title>텍사스, 오늘</title>
   <meta name="theme-color" content="#8d6748" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="apple-touch-icon" href="icon-192.png" /><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;background:#f4f1ec;text-align:center;"><p style="font-family:sans-serif;padding:12px;">이미지를 길게 눌러 사진 앱에 저장하세요.</p><img src="${dataUrl}" style="max-width:100%;height:auto;" /></body></html>`);
+  <link rel="apple-touch-icon" href="icon-192.png" /><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;background:#f4f1ec;text-align:center;"><p style="font-family:sans-serif;padding:12px;">이미지를 길게 눌러 사진 앱에 저장하세요.</p><img src="${dataUrl}" style="max-width:100%;height:auto;" />
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    registrations.forEach(registration => registration.unregister());
+  }).catch(() => {});
+}
+</script>
+</body></html>`);
     win.document.close();
     return true;
   }
@@ -1676,22 +1735,29 @@ function dataUrlToFile(dataUrl, filename) {
 
 async function makeNewsletterDataUrl() {
   const node = document.getElementById("newsletter");
+
+  node.classList.add("captureFullSize");
   await waitForImages(node);
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-  const rect = node.getBoundingClientRect();
-  return await htmlToImage.toPng(node, {
-    pixelRatio: Math.min(2, window.devicePixelRatio || 1),
-    cacheBust: true,
-    backgroundColor: "#f8eedf",
-    skipFonts: true,
-    width: Math.ceil(rect.width),
-    height: Math.ceil(node.scrollHeight),
-    style: {
-      transform: "none",
-      margin: "0"
-    }
-  });
+  try {
+    return await htmlToImage.toPng(node, {
+      pixelRatio: 1,
+      cacheBust: true,
+      backgroundColor: "#f8eedf",
+      skipFonts: true,
+      width: 1080,
+      height: Math.ceil(node.scrollHeight),
+      style: {
+        transform: "none",
+        margin: "0",
+        width: "1080px",
+        minWidth: "1080px"
+      }
+    });
+  } finally {
+    node.classList.remove("captureFullSize");
+  }
 }
 
 function showPreview(dataUrl, date) {
@@ -1756,6 +1822,14 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("shareBtn").addEventListener("click", shareNewsletter);
 });
 
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    registrations.forEach(registration => registration.unregister());
+  }).catch(() => {});
+}
 </script>
 </body>
 </html>
