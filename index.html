@@ -530,7 +530,7 @@
     <aside class="panel">
       <h1>텍사스, 오늘 생성기</h1>
       <p>날짜, 사진, 설명을 넣고 가족 뉴스레터 이미지를 공유하세요.</p>
-      <div class="installNote">휴대폰에서 이 주소를 연 뒤 “홈 화면에 추가”를 하면 앱처럼 사용할 수 있습니다.<br><span id="appVersion">공유 안정화 v8</span></div>
+      <div class="installNote">휴대폰에서 이 주소를 연 뒤 “홈 화면에 추가”를 하면 앱처럼 사용할 수 있습니다.<br><span id="appVersion">공유 대체 방식 v9</span></div>
 
       <label>날짜</label>
       <input id="dateInput" type="date" />
@@ -544,16 +544,16 @@
       <label>사진 업로드</label>
       <input id="photoInput" type="file" accept="image/*" multiple />
       <p class="hint">
-        사진이나 문구를 바꾸면 공유 이미지를 먼저 준비합니다. 버튼을 눌러 “준비 완료” 메시지가 나오면 한 번 더 눌러 카카오톡, 문자, 이메일 등으로 공유하세요.
+        “공유용 이미지 만들기”를 누르면 완성 이미지가 새 화면과 미리보기로 열립니다. 휴대폰에서 이미지를 길게 눌러 저장하거나 카카오톡으로 공유하세요.
       </p>
 
       <div class="row">
         <button type="button" class="secondary" id="regenBtn">날짜 seed로 다시 생성</button>
       </div>
-      <button class="primary" id="shareBtn">결과물 다른 앱으로 공유하기</button>
+      <button class="primary" id="shareBtn">공유용 이미지 만들기</button>
 
       <p class="hint">
-        사진이나 문구를 바꾸면 공유 이미지를 먼저 준비합니다. 버튼을 눌러 “준비 완료” 메시지가 나오면 한 번 더 눌러 카카오톡, 문자, 이메일 등으로 공유하세요.
+        “공유용 이미지 만들기”를 누르면 완성 이미지가 새 화면과 미리보기로 열립니다. 휴대폰에서 이미지를 길게 눌러 저장하거나 카카오톡으로 공유하세요.
       </p>
       <p class="hint" id="saveStatus" style="font-weight:700;"></p>
     </aside>
@@ -1614,7 +1614,7 @@ function render() {
 
   document.getElementById("sourceOut").textContent =
     `${h.source}; CDC Older Adult Physical Activity Guidelines. 개인 건강 상태에 따라 의사 상담이 필요할 수 있습니다.`;
-  markShareDirty();
+
 }
 
 let currentPhotoDataUrls = [];
@@ -1655,7 +1655,7 @@ async function handlePhotos(files) {
   });
 
   await waitForImages(grid);
-  markShareDirty();
+
 }
 
 function waitForImages(container) {
@@ -1722,35 +1722,12 @@ if ("serviceWorker" in navigator) {
 
 
 
-let cachedShareFile = null;
-let cachedDataUrl = null;
-let shareDirty = true;
-let preparingShareImage = false;
-let prepareTimer = null;
+
+let latestGeneratedDataUrl = null;
 
 function setStatus(message) {
   const status = document.getElementById("statusOut");
   if (status) status.textContent = message || "";
-}
-
-function dataUrlToFile(dataUrl, filename) {
-  const parts = dataUrl.split(",");
-  const mime = (parts[0].match(/:(.*?);/) || [])[1] || "image/png";
-  const binary = atob(parts[1]);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return new File([bytes], filename, { type: mime });
-}
-
-function markShareDirty() {
-  shareDirty = true;
-  cachedShareFile = null;
-  cachedDataUrl = null;
-  setStatus("내용이 바뀌었습니다. 잠시 후 공유 이미지가 준비됩니다.");
-  clearTimeout(prepareTimer);
-  prepareTimer = setTimeout(() => {
-    prepareShareImage(false);
-  }, 900);
 }
 
 async function makeNewsletterDataUrl() {
@@ -1780,71 +1757,81 @@ async function makeNewsletterDataUrl() {
   }
 }
 
-function showPreview(dataUrl, date) {
+function showPreview(dataUrl) {
   const box = document.getElementById("sharePreview");
   if (!box) return;
   box.style.display = "block";
   box.innerHTML = `
     <p class="hint" style="margin:0 0 10px !important;">
-      공유창이 열리지 않으면 아래 이미지를 길게 눌러 공유하거나 저장하세요.
+      아래 완성 이미지를 길게 누르면 “사진에 저장”, “공유”, “카카오톡으로 보내기” 등을 선택할 수 있습니다.
     </p>
-    <img src="${dataUrl}" alt="뉴스레터 결과 이미지" />
-    <a href="${dataUrl}" download="텍사스_오늘_${date}.png">이미지 파일로 열기/다운로드</a>
+    <img src="${dataUrl}" alt="뉴스레터 결과 이미지" style="width:100%; border-radius:12px; border:1px solid #eadcc9;" />
   `;
 }
 
-async function prepareShareImage(showMessages = true) {
-  if (preparingShareImage) return false;
-  preparingShareImage = true;
-
-  try {
-    if (showMessages) setStatus("공유 이미지를 준비하는 중입니다. 잠시만 기다려주세요.");
-    const date = document.getElementById("dateInput").value || "today";
-    const dataUrl = await makeNewsletterDataUrl();
-    cachedDataUrl = dataUrl;
-    cachedShareFile = dataUrlToFile(dataUrl, `텍사스_오늘_${date}.png`);
-    shareDirty = false;
-    showPreview(dataUrl, date);
-    setStatus("공유 이미지가 준비되었습니다. 이제 공유 버튼을 한 번 더 누르면 공유창이 열립니다.");
-    return true;
-  } catch (err) {
-    console.error(err);
-    setStatus("공유 이미지 준비에 실패했습니다. 사진 수를 줄이거나 브라우저를 새로고침해보세요.");
-    return false;
-  } finally {
-    preparingShareImage = false;
+function openImageInNewTab(dataUrl) {
+  const win = window.open();
+  if (win) {
+    win.document.write(`
+      <!doctype html>
+      <html lang="ko">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>공유용 이미지</title>
+        <style>
+          body {
+            margin: 0;
+            padding: 12px;
+            background: #f8eedf;
+            font-family: system-ui, sans-serif;
+            color: #2c2925;
+          }
+          p {
+            font-size: 15px;
+            line-height: 1.5;
+          }
+          img {
+            width: 100%;
+            max-width: 1080px;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+          }
+        </style>
+      </head>
+      <body>
+        <p>이미지를 길게 눌러 저장하거나 카카오톡으로 공유하세요.</p>
+        <img src="${dataUrl}" alt="텍사스 오늘 뉴스레터 이미지">
+      </body>
+      </html>
+    `);
+    win.document.close();
   }
 }
 
 async function shareNewsletter() {
   const btn = document.getElementById("shareBtn");
-  const date = document.getElementById("dateInput").value || "today";
-
   try {
-    if (!cachedShareFile || shareDirty) {
-      if (btn) btn.textContent = "공유 이미지 준비 중...";
-      await prepareShareImage(true);
-      if (btn) btn.textContent = "결과물 다른 앱으로 공유하기";
-      return;
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "이미지 만드는 중...";
     }
+    setStatus("공유용 이미지를 만드는 중입니다. 사진이 많으면 조금 걸릴 수 있습니다.");
 
-    if (navigator.share) {
-      try {
-        await navigator.share({ files: [cachedShareFile] });
-        setStatus("공유창을 열었습니다.");
-        return;
-      } catch (err) {
-        console.error(err);
-        setStatus("공유창이 열리지 않았습니다. 아래 미리보기 이미지를 길게 눌러 공유하세요.");
-        if (cachedDataUrl) showPreview(cachedDataUrl, date);
-        return;
-      }
-    }
+    const dataUrl = await makeNewsletterDataUrl();
+    latestGeneratedDataUrl = dataUrl;
+    showPreview(dataUrl);
+    openImageInNewTab(dataUrl);
 
-    setStatus("이 브라우저는 파일 공유를 지원하지 않습니다. 아래 이미지를 길게 눌러 공유하세요.");
-    if (cachedDataUrl) showPreview(cachedDataUrl, date);
+    setStatus("공유용 이미지가 만들어졌습니다. 새로 열린 화면이나 아래 미리보기 이미지를 길게 눌러 공유하세요.");
+  } catch (err) {
+    console.error(err);
+    setStatus("이미지 생성에 실패했습니다. 사진 수를 줄이거나 브라우저를 새로고침해보세요.");
   } finally {
-    if (btn) btn.textContent = "결과물 다른 앱으로 공유하기";
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "공유용 이미지 만들기";
+    }
   }
 }
 
